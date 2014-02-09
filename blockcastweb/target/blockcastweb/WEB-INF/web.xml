@@ -32,6 +32,6 @@
  
     <servlet-mapping>
         <servlet-name>me.blockcast.web.Application</servlet-name>
-        <url-pattern>/Application/*</url-pattern>
+        <url-pattern>/restapi/*</url-pattern>
     </servlet-mapping>
 </web-app>
