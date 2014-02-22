@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +18,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -26,10 +30,47 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import com.amsoftgroup.geospatial.dc.business.Entity;
+
 //Sets the path to base URL + /restapi
 @Path("/")
 public class Application {
 
+	private Logger logger = Logger.getLogger("MyLog");  
+	
+	    public Application(){
+	    	
+		    FileHandler fh;  
+		
+		    try {  
+		
+		        // This block configure the logger with handler and formatter  
+		        fh = new FileHandler("C:\\tmp\\log\\log.txt");  
+		        logger.addHandler(fh);
+		        SimpleFormatter formatter = new SimpleFormatter();  
+		        fh.setFormatter(formatter);  
+		
+		        // the following statement is used to log any messages  
+		        logger.info("Application CTOR");  
+		
+		    } catch (SecurityException e) {  
+		        e.printStackTrace();  
+		    } catch (IOException e) {  
+		        e.printStackTrace();  
+		    }  
+		    
+	    }
+   
+	    
+	    @GET
+		@Path("/getPostByDistance/{distance}/{lon}/{lat}")
+		@Produces({"application/json", "text/xml"})
+		public List<Entity> getEntityByDistance(@PathParam("id") int entityTypeId,
+									  @PathParam("distance") int distance,
+									  @PathParam("lon") double lon,
+									  @PathParam("lat") double lat) {
+			return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
+		}
 	  // This method is called if TEXT_PLAIN is request
 	  @GET
 	  @Produces(MediaType.TEXT_PLAIN)
@@ -59,7 +100,8 @@ public class Application {
 	  @Produces(MediaType.TEXT_HTML)
 	  public String sayHtmlHello() {
 	    return "<html> " + "<title>" + "Current time" + "</title>"
-	        + "<body><h1>" + "Current time: " + new Date().toString() + "</body></h1>" + "</html> ";
+	        + "<body><h1>" + "Current time: " + new Date().toString() + "</body></h1><br><br>" + 
+	    		"temp directory: " + System.getProperty("java.io.tmpdir")+ "</html> ";
 	  }
 	  
 	  @GET
@@ -77,6 +119,9 @@ public class Application {
 	  public Response uploadFile(@Context HttpServletRequest request,
 	    @Context HttpServletResponse response) throws Exception {
 		// Commons file upload classes are specifically instantiated
+		  
+		  	logger.info("in uploadFile");
+		  
 			FileItemFactory factory = new DiskFileItemFactory();
 		 
 			ServletFileUpload upload = new ServletFileUpload(factory);
@@ -103,7 +148,7 @@ public class Application {
 					// If the current item is an HTML form field
 					if (item.isFormField()) {
 						// Return an XML node with the field name and value
-						out.println("this is a form data " + item.getFieldName() + "<br>");
+						logger.info("this is a form data " + item.getFieldName() + "<br>");
 		 
 						// If the current item is file data
 					} else {
@@ -117,7 +162,7 @@ public class Application {
 		 
 						// Return an XML node with the file name and size (in bytes)
 						//out.println(getServletContext().getRealPath("/WEB_INF"));
-						out.println("this is a file with name: " + item.getName());
+						logger.info("this is a file with name: " + item.getName());
 					}
 				}
 		 
@@ -127,11 +172,11 @@ public class Application {
 				// Rudimentary handling of any exceptions
 				// TODO: Something useful if an error occurs
 			} catch (FileUploadException fue) {
-				fue.printStackTrace();
+				logger.info("FileUploadException: " + fue.toString());  
 			} catch (IOException ioe) {
-				ioe.printStackTrace();
+				logger.info("IOException: " + ioe.toString());  
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.info("Exception: " + e.toString());  
 			}
 			return null;
 	  }

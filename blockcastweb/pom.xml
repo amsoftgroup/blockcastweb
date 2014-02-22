@@ -72,6 +72,24 @@
 	<scope>provided</scope>
   </dependency>
   
+  <!-- For PostgreSQL up to 9.1, use: -->
+
+  <dependency>
+    <groupId>postgresql</groupId>
+	<artifactId>postgresql</artifactId>
+	<version>9.1-901.jdbc4</version>	
+  </dependency>
+
+<!-- 
+or for 9.2+
+
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>VERSION</version>
+</dependency>
+ -->
+  
   </dependencies>
   <build>
     <finalName>blockcastweb</finalName>
