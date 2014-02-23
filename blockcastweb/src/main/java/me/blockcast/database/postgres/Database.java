@@ -8,7 +8,7 @@ public class Database {
 
 	private static String host = "localhost";
 	private static int port = 5432;
-	private static String database = "ncaa";
+	private static String database = "blockcast";
 	private static String user = "postgres";
 	private static String password = "relculo";
 

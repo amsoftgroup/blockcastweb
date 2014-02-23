@@ -2,7 +2,9 @@ package me.blockcast.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -22,166 +24,189 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
+import me.blockcast.data.BlockcastManager;
+import me.blockcast.web.pojo.Location;
+import me.blockcast.web.pojo.Post;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
-import com.amsoftgroup.geospatial.dc.business.Entity;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.BodyPart;
+import org.glassfish.jersey.media.multipart.BodyPartEntity;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.MultiPart;
 
 //Sets the path to base URL + /restapi
 @Path("/")
 public class Application {
 
 	private Logger logger = Logger.getLogger("MyLog");  
+
+	public Application(){}
+
+	@GET
+	@Path("/getPostsByDistance/{distance}/{lon}/{lat}")
+	@Produces({"application/json", "text/xml"})
+	public List<Post> getEntityByDistance(@PathParam("id") int entityTypeId,
+			@PathParam("distance") int distance,
+			@PathParam("lon") double lon,
+			@PathParam("lat") double lat) {
+		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
+
+		return BlockcastManager.getPostWithinRadius(distance, lon, lat);
+	}
 	
-	    public Application(){
-	    	
-		    FileHandler fh;  
+	@POST
+	@Path("/insertPost/{lon}/{lat}/{parent_id}")
+	@Consumes("multipart/form-data")
+	public void insertPost(@PathParam("parent_id") int parent_id,
+			@PathParam("lon") double lon,
+			@PathParam("lat") double lat,
+			MultiPart data
+			) {
 		
-		    try {  
-		
-		        // This block configure the logger with handler and formatter  
-		        fh = new FileHandler("C:\\tmp\\log\\log.txt");  
-		        logger.addHandler(fh);
-		        SimpleFormatter formatter = new SimpleFormatter();  
-		        fh.setFormatter(formatter);  
-		
-		        // the following statement is used to log any messages  
-		        logger.info("Application CTOR");  
-		
-		    } catch (SecurityException e) {  
-		        e.printStackTrace();  
-		    } catch (IOException e) {  
-		        e.printStackTrace();  
-		    }  
-		    
-	    }
-   
-	    
-	    @GET
-		@Path("/getPostByDistance/{distance}/{lon}/{lat}")
-		@Produces({"application/json", "text/xml"})
-		public List<Entity> getEntityByDistance(@PathParam("id") int entityTypeId,
-									  @PathParam("distance") int distance,
-									  @PathParam("lon") double lon,
-									  @PathParam("lat") double lat) {
-			return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
-		}
-	  // This method is called if TEXT_PLAIN is request
-	  @GET
-	  @Produces(MediaType.TEXT_PLAIN)
-	  public String sayPlainTextHello() {
-	    return "Current time: " + new Date().toString();
-	  }
-	
-	  // This method is called if XML is request
-	  @GET
-	  @Produces(MediaType.TEXT_XML)
-	  public String sayXMLHello() {
-	    return "<?xml version=\"1.0\"?>" + "<hello> Hello World" + "</hello>";
-	  }
-	
-	  
-	  @GET
-	  @Path("count")
-	  @Produces(MediaType.TEXT_PLAIN)
-	  public String getCount() {
-	    int count = 42;
-	    return String.valueOf(count);
-	  }
-	  
-	  
-	  // This method is called if HTML is request
-	  @GET
-	  @Produces(MediaType.TEXT_HTML)
-	  public String sayHtmlHello() {
-	    return "<html> " + "<title>" + "Current time" + "</title>"
-	        + "<body><h1>" + "Current time: " + new Date().toString() + "</body></h1><br><br>" + 
-	    		"temp directory: " + System.getProperty("java.io.tmpdir")+ "</html> ";
-	  }
-	  
-	  @GET
-	  @Path("upload")
-	  @Produces(MediaType.TEXT_HTML)
-	  public String uploadGet() {
-	    return "<html> " + "<title>" + "upload get" + "</title>"
-	        + "<body><h1>" + "upload get:" + new Date().toString() + "</body></h1>" + "</html> ";
-	  }
-	  
-	  @POST
-	  @Path("upload")
-	  @Consumes(MediaType.MULTIPART_FORM_DATA)
-	  @Produces(MediaType.TEXT_PLAIN)
-	  public Response uploadFile(@Context HttpServletRequest request,
-	    @Context HttpServletResponse response) throws Exception {
-		// Commons file upload classes are specifically instantiated
-		  
-		  	logger.info("in uploadFile");
-		  
-			FileItemFactory factory = new DiskFileItemFactory();
-		 
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			ServletOutputStream out = null;
-		 
+		for (int i = 0; i < data.getBodyParts().size(); i++){
+			
+			MultivaluedMap<String, String> map = data.getBodyParts().get(i).getHeaders();
+			BodyPartEntity bpe = (BodyPartEntity) data.getBodyParts().get(i).getEntity();
+			
+			InputStream is = bpe.getInputStream();
+			StringWriter writer = new StringWriter();
 			try {
-				// Parse the incoming HTTP request
-				// Commons takes over incoming request at this point
-				// Get an iterator for all the data that was sent
-				List items = upload.parseRequest(request);
-				Iterator iter = items.iterator();
-		 
-				// Set a response content type
-				response.setContentType("text/html");
-		 
-				// Setup the output stream for the return XML data
-				out = response.getOutputStream();
-		 
-				// Iterate through the incoming request data
-				while (iter.hasNext()) {
-					// Get the current item in the iteration
-					FileItem item = (FileItem) iter.next();
-		 
-					// If the current item is an HTML form field
-					if (item.isFormField()) {
-						// Return an XML node with the field name and value
-						logger.info("this is a form data " + item.getFieldName() + "<br>");
-		 
-						// If the current item is file data
-					} else {
-						// Specify where on disk to write the file
-						// Using a servlet init param to specify location on disk
-						// Write the file data to disk
-						// TODO: Place restrictions on upload data
-						String tmpdir = System.getProperty("java.io.tmpdir");
-						File disk = new File(tmpdir +item.getName());
-						item.write(disk);
-		 
-						// Return an XML node with the file name and size (in bytes)
-						//out.println(getServletContext().getRealPath("/WEB_INF"));
-						logger.info("this is a file with name: " + item.getName());
-					}
-				}
-		 
-				// Close off the response XML data and stream
-		 
-				out.close();
-				// Rudimentary handling of any exceptions
-				// TODO: Something useful if an error occurs
-			} catch (FileUploadException fue) {
-				logger.info("FileUploadException: " + fue.toString());  
-			} catch (IOException ioe) {
-				logger.info("IOException: " + ioe.toString());  
-			} catch (Exception e) {
-				logger.info("Exception: " + e.toString());  
+				IOUtils.copy(is, writer);
+			} catch (IOException e) {
+				System.out.println("error" + e.toString());
 			}
-			return null;
-	  }
-	  
-	  /*
+			String theString = writer.toString();
+			System.out.println("theString=" + theString);
+			
+			Post post = new Post();
+			post.setLocation(new Location(lon, lat));
+			post.setContent(theString);
+			post.setParentId(parent_id);
+			BlockcastManager.insertPost(post);
+			
+		}
+		
+	}
+	
+	// This method is called if TEXT_PLAIN is request
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	public String sayPlainTextHello() {
+		return "Current time: " + new Date().toString();
+	}
+
+	// This method is called if XML is request
+	@GET
+	@Produces(MediaType.TEXT_XML)
+	public String sayXMLHello() {
+		return "<?xml version=\"1.0\"?>" + "<hello> Hello World" + "</hello>";
+	}
+
+
+	@GET
+	@Path("count")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCount() {
+		int count = 42;
+		return String.valueOf(count);
+	}
+
+
+	// This method is called if HTML is request
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	public String sayHtmlHello() {
+		return "<html> " + "<title>" + "Current time" + "</title>"
+				+ "<body><h1>" + "Current time: " + new Date().toString() + "</body></h1><br><br>" + 
+				"temp directory: " + System.getProperty("java.io.tmpdir")+ "</html> ";
+	}
+
+	@GET
+	@Path("upload")
+	@Produces(MediaType.TEXT_HTML)
+	public String uploadGet() {
+		return "<html> " + "<title>" + "upload get" + "</title>"
+				+ "<body><h1>" + "upload get:" + new Date().toString() + "</body></h1>" + "</html> ";
+	}
+
+	@POST
+	@Path("upload")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response uploadFile(@Context HttpServletRequest request,
+			@Context HttpServletResponse response) throws Exception {
+		// Commons file upload classes are specifically instantiated
+
+		logger.info("in uploadFile");
+
+		FileItemFactory factory = new DiskFileItemFactory();
+
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		ServletOutputStream out = null;
+
+		try {
+			// Parse the incoming HTTP request
+			// Commons takes over incoming request at this point
+			// Get an iterator for all the data that was sent
+			List items = upload.parseRequest(request);
+			Iterator iter = items.iterator();
+
+			// Set a response content type
+			response.setContentType("text/html");
+
+			// Setup the output stream for the return XML data
+			out = response.getOutputStream();
+
+			// Iterate through the incoming request data
+			while (iter.hasNext()) {
+				// Get the current item in the iteration
+				FileItem item = (FileItem) iter.next();
+
+				// If the current item is an HTML form field
+				if (item.isFormField()) {
+					// Return an XML node with the field name and value
+					logger.info("this is a form data " + item.getFieldName() + "<br>");
+
+					// If the current item is file data
+				} else {
+					// Specify where on disk to write the file
+					// Using a servlet init param to specify location on disk
+					// Write the file data to disk
+					// TODO: Place restrictions on upload data
+					String tmpdir = System.getProperty("java.io.tmpdir");
+					File disk = new File(tmpdir +item.getName());
+					item.write(disk);
+
+					// Return an XML node with the file name and size (in bytes)
+					//out.println(getServletContext().getRealPath("/WEB_INF"));
+					logger.info("this is a file with name: " + item.getName());
+				}
+			}
+
+			// Close off the response XML data and stream
+
+			out.close();
+			// Rudimentary handling of any exceptions
+			// TODO: Something useful if an error occurs
+		} catch (FileUploadException fue) {
+			logger.info("FileUploadException: " + fue.toString());  
+		} catch (IOException ioe) {
+			logger.info("IOException: " + ioe.toString());  
+		} catch (Exception e) {
+			logger.info("Exception: " + e.toString());  
+		}
+		return null;
+	}
+
+	/*
 	  @POST
 	  @Consumes(MediaType.MULTIPART_FORM_DATA)
 	  @Produces(MediaType.APPLICATION_JSON)
@@ -214,6 +239,6 @@ public class Application {
 
 	      }
 	  }
-	  */
+	 */
 
 }

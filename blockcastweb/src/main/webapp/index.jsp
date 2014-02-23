@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/sample.css"/>
 
 <body>
-<h1>Hello World!</h1>
-
+<h1>blockcast->me</h1>
+<img src='images/blockcast.gif'>
 <input id="fileupload" type="file" name="files[]" data-url="restapi/upload/" multiple>
 </br>
 </br>
