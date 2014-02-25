@@ -26,28 +26,16 @@
 			<artifactId>jersey-common</artifactId>
 			<version>2.5.1</version>
 		</dependency>
-		<dependency>
-<<<<<<< HEAD
-		    <groupId>org.glassfish.jersey.core</groupId> 
-		    <artifactId>jersey-client</artifactId> 
-			<version>2.5.1</version> 
-		</dependency> 
 	    <dependency>
 	        <groupId>org.glassfish.jersey.containers</groupId>
 	        <artifactId>jersey-container-jdk-http</artifactId>
 	        <version>2.5.1</version>
-	    </dependency>
-=======
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>2.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-jdk-http</artifactId>
 			<version>2.5.1</version>
 		</dependency>
->>>>>>> 9a74b56a6ffb852d9c245884cdbe33e2ff634a9f
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-multipart</artifactId>
@@ -95,17 +83,11 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.3.2</version>
 		</dependency>
-
-<<<<<<< HEAD
-=======
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.3.2</version>
 		</dependency>
-
-
->>>>>>> 9a74b56a6ffb852d9c245884cdbe33e2ff634a9f
 
 		<!-- For PostgreSQL up to 9.1, use: -->
 
@@ -115,18 +97,13 @@
 			<version>9.1-901.jdbc4</version>
 		</dependency>
 
-
-<<<<<<< HEAD
 		<!-- or for 9.2+ 
 		<dependency> 
 			<groupId>org.postgresql</groupId> 
 			<artifactId>postgresql</artifactId> 
 			<version>VERSION</version> 
 		</dependency> -->
-=======
-		<!-- or for 9.2+ <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
-			<version>VERSION</version> </dependency> -->
->>>>>>> 9a74b56a6ffb852d9c245884cdbe33e2ff634a9f
+
 
 	</dependencies>
 	<build>
