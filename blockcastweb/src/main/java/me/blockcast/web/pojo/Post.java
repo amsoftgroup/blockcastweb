@@ -15,6 +15,7 @@ public class Post implements java.io.Serializable {
 	private String content;
 	private long parentId;
 	private Date postTimestamp;
+	private long duration;
 	private long distance;
 
 	public Post() {
@@ -82,6 +83,14 @@ public class Post implements java.io.Serializable {
 
 	public void setDistance(long distance) {
 		this.distance = distance;
+	}
+
+	public long getDuration() {
+		return duration;
+	}
+
+	public void setDuration(long duration) {
+		this.duration = duration;
 	}
 
 }

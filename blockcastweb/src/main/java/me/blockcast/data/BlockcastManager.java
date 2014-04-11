@@ -1,10 +1,16 @@
 package me.blockcast.data;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.postgresql.geometric.PGpoint;
 
@@ -86,9 +92,12 @@ public class BlockcastManager {
 
 	public static void insertPost(Post post){
 
-		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp) " + 
+		System.out.println( "post.getContent()  : " + post.getContent()) ;
+		System.out.println( "post.getDistance()  : " + post.getDistance()) ;
+		System.out.println( "post.getDuration()  : " + post.getDuration()) ;
+		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters) " + 
 				//"VALUES(ST_GeomFromText('POINT(" + lon + " " +  lat + ")', 4326), ? , -1, CURRENT_TIMESTAMP);";
-				"VALUES(ST_GeomFromText(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP);";
+				"VALUES(ST_GeomFromText(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
 		PreparedStatement ps =  null;
 		Connection c = null;
 
@@ -102,6 +111,8 @@ public class BlockcastManager {
 			ps.setDouble(1, post.getLocation().getLon());
 			ps.setDouble(2, post.getLocation().getLat());
 			ps.setString(3, post.getContent());
+			ps.setLong(4, post.getDuration());
+			ps.setLong(5, post.getDistance());
 			ps.execute();
 			
 			ps.close();
@@ -131,4 +142,6 @@ public class BlockcastManager {
 		d = null;
 
 	}
+	
+
 }
