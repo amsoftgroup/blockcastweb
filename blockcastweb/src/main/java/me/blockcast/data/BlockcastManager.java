@@ -143,5 +143,55 @@ public class BlockcastManager {
 
 	}
 	
+	public static String testDB(){
+
+
+		String sql = " Select version()";
+		PreparedStatement ps =  null;
+		Connection c = null;
+		String version = null;
+		
+		Database d = new Database();
+
+		try {
+
+			c = d.getConnection();
+			ps = c.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			
+			while( rs.next() ){		
+				
+				version = rs.getString("version");
+
+			}
+
+			rs.close();
+			ps.close();
+			c.close();
+		}
+		catch( SQLException se )
+		{
+			System.out.println( "SQL Exception:" ) ;
+
+			while( se != null )
+			{
+				System.out.println( "State  : " + se.getSQLState()  ) ;
+				System.out.println( "Message: " + se.getMessage()   ) ;
+				System.out.println( "Error  : " + se.getErrorCode() ) ;
+
+				se = se.getNextException() ;
+			}
+		}
+		catch( Exception e )
+		{
+			System.out.println( e ) ;
+		}
+
+		ps = null;
+		c = null;
+		d = null;
+		
+		return version;
+	}
 
 }

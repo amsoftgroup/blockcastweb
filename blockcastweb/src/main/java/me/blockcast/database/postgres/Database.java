@@ -6,11 +6,12 @@ import java.sql.SQLException;
 
 public class Database {
 
+	//private static String host = "localhost";
 	private static String host = "localhost";
 	private static int port = 5432;
 	private static String database = "blockcast";
-	private static String user = "postgres";
-	private static String password = "relculo";
+	private static String user = "blockcast";
+	private static String password = "Cym4ge!!Cym4ge!!";
 
 	private static String TAG = "Database";
 	

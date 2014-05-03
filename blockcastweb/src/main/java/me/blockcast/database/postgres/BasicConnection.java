@@ -8,11 +8,12 @@ import java.util.Properties;
 
 public class BasicConnection {
 
-	private static String host = "192.168.211.1";
+	//private static String host = "192.168.211.1";
+	private static String host = "ec2-107-20-45-104.compute-1.amazonaws.com";
 	private static int port = 5432;
 	private static String database = "blockcast";
-	private static String user = "postgres";
-	private static String password = "relculo";
+	private static String user = "blockcast";
+	private static String password = "Cym4ge!!Cym4ge!!";
 
 	private static String TAG = "Database";
 
@@ -22,10 +23,10 @@ public class BasicConnection {
 		
 		try{
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://192.168.211.1/blockcast";
+			String url = "jdbc:postgresql://" + host + "/blockcast";
 			Properties props = new Properties();
-			props.setProperty("user","postgres");
-			props.setProperty("password","relculo");
+			props.setProperty("user",user);
+			props.setProperty("password",password);
 			//props.setProperty("ssl","true");
 			conn = DriverManager.getConnection(url, props);
 			System.out.println("Connection Succeeded: ");

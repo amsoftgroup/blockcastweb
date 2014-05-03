@@ -51,6 +51,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.BodyPartEntity;
@@ -75,6 +76,15 @@ public class Application extends ResourceConfig  {
     	registerInstances(new LoggingFilter(Logger.getLogger(Application.class.getName()), true));
 	}
 
+	@GET
+	@Path("/testdb")
+	@Produces({"application/json", "text/xml"})
+	public String getTestDB() {
+		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
+
+		return BlockcastManager.testDB();
+	}
+	
 	@GET
 	@Path("/getPostsByDistance/{distance}/{lon}/{lat}")
 	@Produces({"application/json", "text/xml"})
