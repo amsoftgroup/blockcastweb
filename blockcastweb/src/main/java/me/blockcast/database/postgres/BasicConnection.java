@@ -9,7 +9,7 @@ import java.util.Properties;
 public class BasicConnection {
 
 	//private static String host = "192.168.211.1";
-	private static String host = "ec2-107-20-45-104.compute-1.amazonaws.com";
+	private static String host = "xxxxxxxxxx";
 	private static int port = 5432;
 	private static String database = "blockcast";
 	private static String user = "blockcast";

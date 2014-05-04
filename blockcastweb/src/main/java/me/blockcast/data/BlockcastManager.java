@@ -21,11 +21,9 @@ public class BlockcastManager {
 
 	public static ArrayList<Post> getPostWithinRadius(int distance, double lon, double lat){
 
-		//String sql = "SELECT ST_Distance(location, GeomFromText('POINT(" + lon + " " + lat + ")',4326)  ) as dist_meters,  " +
-		String sql = "SELECT ST_Distance_Sphere(location , GeomFromText(ST_MakePoint(?, ?),4326)  ) as dist_meters,  " +
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  " +
 				"id, content, parent_id, post_timestamp from op ";
-		//sql += " WHERE st_dwithin(location, GeomFromText('POINT(" + lon + " " + lat +")',4326)," + distance + ")" +
-		sql += " WHERE st_dwithin(location, GeomFromText(ST_MakePoint(?, ?),4326), ? )" +
+		sql += " WHERE st_dwithin(location, ST_MakePoint(?,?), ? )" +
 				" order by dist_meters asc";
 
 		ArrayList<Post> ets = new ArrayList<Post>();
@@ -97,7 +95,8 @@ public class BlockcastManager {
 		System.out.println( "post.getDuration()  : " + post.getDuration()) ;
 		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters) " + 
 				//"VALUES(ST_GeomFromText('POINT(" + lon + " " +  lat + ")', 4326), ? , -1, CURRENT_TIMESTAMP);";
-				"VALUES(ST_GeomFromText(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
+				//"VALUES(ST_GeomFromText(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
+				"VALUES(ST_MakePoint(?, ?), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
 		PreparedStatement ps =  null;
 		Connection c = null;
 

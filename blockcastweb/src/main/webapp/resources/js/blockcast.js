@@ -1,7 +1,7 @@
 /**
  * 
  */
-var blockcast_url = document.location.hostname + '/blockcast/';
+var blockcast_url = document.location.hostname;
 
 function buildupload(){
 
@@ -18,7 +18,6 @@ function buildupload(){
 			
 		    url: blockcast_url + 'restapi/upload',
 	
-		
 		    done: function (e, data) {
 		    	alert('fileupload.done');
 		        // $.each(data.result.files, function (index, file) {
@@ -27,9 +26,6 @@ function buildupload(){
 		    }
 		});
 	});
-	
-	
-	alert('hi again');
 
 }
 

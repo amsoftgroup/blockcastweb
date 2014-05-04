@@ -19,7 +19,7 @@ System.getProperty("java.io.tmpdir")=<%=System.getProperty("java.io.tmpdir") %>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/jQuery-File-Upload-7.2.1/jquery.fileupload-jui.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/jQuery-File-Upload-7.2.1/jquery.fileupload-ui.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/jQuery-File-Upload-7.2.1/jquery.iframe-transport.js"></script>
-
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/jQuery-File-Upload-7.2.1/jquery.iframe-transport.js"></script>
 <!-- 
 <script src="js/vendor/jquery.ui.widget.js"></script>
 <script src="js/jquery.iframe-transport.js"></script>
