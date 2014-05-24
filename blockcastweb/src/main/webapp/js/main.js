@@ -11,6 +11,27 @@
 
 /* global $, window */
 
+/*
+$(function () {
+		$('#fileupload').fileupload({
+			
+			dataType: 'json',
+			
+		    url: 'restapi/upload',
+	
+		    data: JSON.stringify({ name : "AA" }),
+		    
+		    done: function (e, data) {
+		    	alert('fileupload.done');
+		        // $.each(data.result.files, function (index, file) {
+		        //     $('<p/>').text(file.name).appendTo(document.body);
+		        // });
+		    }
+		});
+	});
+*/
+
+
 $(function () {
     'use strict';
 

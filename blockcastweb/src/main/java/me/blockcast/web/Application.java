@@ -1,9 +1,12 @@
 package me.blockcast.web;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,9 +20,13 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -47,11 +54,14 @@ import me.blockcast.web.pojo.Post;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.BodyPartEntity;
@@ -61,6 +71,8 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 //Sets the path to base URL + /restapi
@@ -70,10 +82,10 @@ public class Application extends ResourceConfig  {
 	private Logger logger = Logger.getLogger("MyLog");  
 	private String timeformat = "yyyy/MM/dd HH:mm:ss";
 	private SimpleDateFormat df = new SimpleDateFormat(timeformat);  
-	
+
 	public Application(){
-    	register(MultiPartFeature.class);
-    	registerInstances(new LoggingFilter(Logger.getLogger(Application.class.getName()), true));
+		register(MultiPartFeature.class);
+		registerInstances(new LoggingFilter(Logger.getLogger(Application.class.getName()), true));
 	}
 
 	@GET
@@ -84,7 +96,7 @@ public class Application extends ResourceConfig  {
 
 		return BlockcastManager.testDB();
 	}
-	
+
 	@GET
 	@Path("/getPostsByDistance/{distance}/{lon}/{lat}")
 	@Produces({"application/json", "text/xml"})
@@ -96,33 +108,33 @@ public class Application extends ResourceConfig  {
 
 		return BlockcastManager.getPostWithinRadius(distance, lon, lat);
 	}
-	
+
 	@GET
 	@Path("/insertPost")
 	@Produces(MediaType.TEXT_HTML)
 	public String insertPost() {
 
-	    return "returned from /insertPost: " + new Date().toGMTString();
+		return "returned from /insertPost: " + new Date().toGMTString();
 	}
-	
-	
+
+
 	@POST
 	@Path("/insertPost")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_HTML)
 	//public String insertPost(@FormDataParam("schema") final String schema) {
 	public String insertPost(FormDataMultiPart formDataMultiPart) {
-	
+
 		Map<String, List<FormDataBodyPart>> fields = formDataMultiPart.getFields();
-		
+
 		Post post = new Post();
 		double lon = Double.MAX_VALUE;
 		double lat = Double.MAX_VALUE;
-		
+
 		// TODO: no need to loop, we're only interested in element 0 (for now?)
 		for (Entry<String, List<FormDataBodyPart>> entry : fields.entrySet()){
 			List<FormDataBodyPart> formdatabodyparts = entry.getValue();
-			
+
 
 			for (int i = 0; i < formdatabodyparts.size(); i++){
 				String name = formdatabodyparts.get(i).getName();
@@ -155,9 +167,9 @@ public class Application extends ResourceConfig  {
 		post.setLocation(location);	
 		BlockcastManager.insertPost(post);
 
-	    return "returned " + formDataMultiPart.getFields().size();
+		return "returned " + formDataMultiPart.getFields().size();
 	}
-	
+
 	@POST
 	@Path("/insertPost/{lon}/{lat}/{parent_id}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -169,7 +181,7 @@ public class Application extends ResourceConfig  {
 		//FormDataMultiPart contentbp = data;
 		//String content = (String)contentbp.getEntity();
 		System.out.println("VALUE=<null>" );
-	        /*
+		/*
 		for (int i = 0; i < data.getBodyParts().size(); i++){
 			BodyPart bodypart = data.getBodyParts().get(i);
 			bodypart.getEntity();
@@ -180,8 +192,8 @@ public class Application extends ResourceConfig  {
 		      String entityString = bodypart.getEntity();
 
 		}
-		*/
-			
+		 */
+
 		/*
 		double dlon = Double.parseDouble(lon);
 		double dlat = Double.parseDouble(lat);
@@ -194,7 +206,7 @@ public class Application extends ResourceConfig  {
 			Log.e(TAG, e2.toString());
 		}
 		long lduration = Long.parseLong(duration);
-		*/
+		 */
 		Post post = new Post();
 		BlockcastManager.insertPost(post);
 
@@ -209,9 +221,9 @@ public class Application extends ResourceConfig  {
 
 			Post post = data.getBodyParts().get(0).getEntityAs(Post.class);
 			BlockcastManager.insertPost(post);
-		
+
 	}
-	*/
+	 */
 	// This method is called if TEXT_PLAIN is request
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
@@ -237,6 +249,7 @@ public class Application extends ResourceConfig  {
 
 
 	// This method is called if HTML is request
+	/*
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public String sayHtmlHello() {
@@ -252,64 +265,249 @@ public class Application extends ResourceConfig  {
 		return "<html> " + "<title>" + "upload get" + "</title>"
 				+ "<body><h1>" + "upload get:" + new Date().toString() + "</body></h1>" + "</html> ";
 	}
-
+	 */
+	/*
 	@POST
 	@Path("upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response uploadFile(@Context HttpServletRequest request,
+	@Produces(MediaType.APPLICATION_JSON)
+	public String uploadFile(@Context HttpServletRequest request,
 			@Context HttpServletResponse response) throws Exception {
-		// Commons file upload classes are specifically instantiated
 
-		logger.info("in uploadFile");
 
-		FileItemFactory factory = new DiskFileItemFactory();
+		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
-		ServletFileUpload upload = new ServletFileUpload(factory);
-		ServletOutputStream out = null;
+		if (isMultipart) {
 
-		try {
-			// Parse the incoming HTTP request
-			// Commons takes over incoming request at this point
-			// Get an iterator for all the data that was sent
-			List items = upload.parseRequest(request);
-			Iterator iter = items.iterator();
+			logger.log(Level.SEVERE, "isMultipart");	    
+			FileItemFactory factory = new DiskFileItemFactory();
+			ServletFileUpload upload = new ServletFileUpload(factory);
 
-			// Set a response content type
-			response.setContentType("text/html");
+			try {
+				List items = upload.parseRequest(request);
+				Iterator iterator = items.iterator();
+				while (iterator.hasNext()) {
+					FileItem item = (FileItem) iterator.next();
+					if (!item.isFormField()) {
+						String fileName = item.getName();
 
-			// Setup the output stream for the return XML data
-			out = response.getOutputStream();
-
-			// Iterate through the incoming request data
-			while (iter.hasNext()) {
-				// Get the current item in the iteration
-				FileItem item = (FileItem) iter.next();
-
-				// If the current item is an HTML form field
-				if (item.isFormField()) {
-					// Return an XML node with the field name and value
-					logger.info("this is a form data " + item.getFieldName() + "<br>");
-
-					// If the current item is file data
-				} else {
-					// Specify where on disk to write the file
-					// Using a servlet init param to specify location on disk
-					// Write the file data to disk
-					// TODO: Place restrictions on upload data
-					String tmpdir = System.getProperty("java.io.tmpdir");
-					File disk = new File(tmpdir +item.getName());
-					item.write(disk);
-
-					// Return an XML node with the file name and size (in bytes)
-					//out.println(getServletContext().getRealPath("/WEB_INF"));
-					logger.info("this is a file with name: " + item.getName());
+						String root = System.getProperty("java.io.tmpdir");
+						File path = new File(root + File.separator + "fileuploads");
+						if (!path.exists()) {
+							boolean status = path.mkdirs();
+						}
+						logger.log(Level.INFO, "path + File.separator + fileName= " + path + File.separator + fileName);	  
+						File uploadedFile = new File(path + File.separator + fileName);
+						item.write(uploadedFile);
+					}
 				}
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "err: "+e.toString());	    
 			}
+		}else{
+			logger.log(Level.INFO, "is NOT Multipart");	  
+		}
+		//String retString = "{\"Name\":\"reedbn\",\"Age\":\"38\"}";
+
+		String retString = "{" +
+						   "\"files\":"+
+						   "["+
+						     "{" + 
+			        	       "\"url\": \"url\","+
+			                   "\"thumbnail_url\": \"thumbnail_url\","+
+			                   "\"name\": \"name\","+
+			                   "\"type\": \"type\","+
+			                   "\"size\": \"46353\","+
+			                   "\"delete_url\": \"delete_url\","+
+			                   "\"delete_type\": \"delete_type\""+
+			        	   	 "}"+
+			        	   "]" +
+			        	   "}";
+
+		logger.log(Level.INFO, "retString" + retString);	  
+
+		return retString;
+	}
+	 */
+
+	
+	/*
+	 * 
+	 * JsonObjectBuilder jsonbuilder = Json.createObjectBuilder();
+
+if (!ServletFileUpload.isMultiPartContent(request){
+    return jsonbuilder.add("error", "REQ is not multipart").build().toString();
+}
+
+
+
+
+ServletFileUpload uploadHandler = new ServletFileUpload(new
+DiskFileItemFactory());
+
+
+String portUrl = "";
+if (request.getServerPort() != 80){
+    portUrl = ":" + request.getServerPort();
+}
+String restUrl = request.getScheme() + "://" + request.getServerName()
++ portUrl + request.getContextPath();
+
+
+File tempfile = new File(tempdir);
+
+// if tempdir doesnt exist make it
+
+JsonArrayBuilder jarraybuilder = Json.CreateArrayBuilder();
+
+List<FileItem> items = uploadHandler.parseRequest(request);
+
+For (FileItem item : items){
+
+if (!item.isFormField()){
+
+
+
+
+JsonObjectBuilder job = new...
+String nameOnly =
+item.getName().substring(item.getName().lastIndexOf("\\")+1,
+item.getName().length());
+
+String index = item.getName().lastIndexOf('.');
+
+int length = item.getName().length();
+
+String extension = item.getName().substring(index,length);
+
+File f = new File(tempdir, "FILENAME");
+item.write(f);
+
+job.add("","")
+//...
+jarraybuilder.add(job.build());
+
+}
+
+ret jarraybuilder.build().toString();
+*/
+	
+	@GET
+	@Path("upload")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String uploadget(@Context HttpServletRequest request,
+			@Context HttpServletResponse response) throws Exception {
+		
+		return "(\"success\": \"true\")";
+	}
+	
+	@POST
+	@Path("upload")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String uploadFile(@Context HttpServletRequest request,
+			@Context HttpServletResponse response) throws Exception {
+		
+		JsonObjectBuilder arraybuilder = Json.createObjectBuilder();
+		//String tmpdir = System.getProperty("java.io.tmpdir");
+		String tmpdir = "/opt/tomcat/webapps/ROOT/images/";
+		
+		logger.info("in uploadFile: tmpdir=" + tmpdir);
+		File tmpdirfile = new File(tmpdir);
+
+		boolean mkfolder = false;
+		if(!tmpdirfile.exists()) {
+			mkfolder = tmpdirfile.mkdir();
+		}
+		
+
+		// Commons file upload classes are specifically instantiated
+		
+		//DiskFileItemFactory factory = new DiskFileItemFactory();
+		
+		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+
+		String portUrl = "";
+		if (request.getServerPort() != 80){
+		    portUrl = ":" + request.getServerPort();
+		}
+		String restUrl = request.getScheme() + "://" + request.getServerName()
+		+ portUrl + request.getContextPath();
+		
+		
+		// Parse the request
+		List<FileItem> items = upload.parseRequest(request);
+		boolean ismultipart = ServletFileUpload.isMultipartContent(request);
+		String content_len = ServletFileUpload.CONTENT_LENGTH;
+		logger.info("ismultipart=" + ismultipart);
+		logger.info("content_len=" + content_len);
+		JsonArrayBuilder jarraybuilder = Json.createArrayBuilder();
+
+		
+		logger.info("items: " + items.size()); 
+		
+		Iterator<FileItem> iter = items.iterator();
+
+		//ServletOutputStream out = null;
+
+		String nameOnly = null;
+		String extension = null;
+		int index = -1;
+		int length = -1;
+		
+		while (iter.hasNext()) {
+			// Get the current item in the iteration
+			FileItem item = (FileItem) iter.next();
+			logger.info("item: " + item.getFieldName());
+			// If the current item is an HTML form field
+			if (item.isFormField()) {
+				// Return an XML node with the field name and value
+				logger.info("this is a form data " + item.getFieldName() + "<br>");
+
+				// If the current item is file data
+			} else {
+				logger.info("this is not  form data " + item.getFieldName() + "<br>");
+				// Specify where on disk to write the file
+				// Using a servlet init param to specify location on disk
+				// Write the file data to disk
+				// TODO: Place restrictions on upload data
+
+
+
+				//File disk = new File(tmpdir +item.getName());
+				nameOnly =
+						item.getName().substring(item.getName().lastIndexOf("\\")+1,
+								item.getName().length());
+
+				index = item.getName().lastIndexOf('.');
+
+				length = item.getName().length();
+
+				extension = item.getName().substring(index,length);
+
+				File uploadedFile = new File(tmpdir + File.separator + "TEST.txt");
+				item.write(uploadedFile);
+				
+				JsonObjectBuilder builder = Json.createObjectBuilder();
+                builder.add("name", item.getName());
+                builder.add("type", item.getContentType());
+                builder.add("size", item.getSize());
+                builder.add("url", tmpdir + "/" + item.getName());
+                builder.add("thumbnail_url", extension);
+                builder.add("delete_url", tmpdir + "/" + item.getName());
+                builder.add("delete_type", "DELETE");
+                    
+                arraybuilder.add("\"files\"", builder);
+
+			}
+		}
+
+		/*try{
+
 
 			// Close off the response XML data and stream
-
-			out.close();
+			//out.write(arraybuilder.build().toString().getBytes());
+			//out.close();
 			// Rudimentary handling of any exceptions
 			// TODO: Something useful if an error occurs
 		} catch (FileUploadException fue) {
@@ -319,7 +517,23 @@ public class Application extends ResourceConfig  {
 		} catch (Exception e) {
 			logger.info("Exception: " + e.toString());  
 		}
-		return null;
+		 */
+		
+		String ret = "{\"files\":[{" + 
+	        "\"url\":\"http://url.to/file/or/page\"," + 
+	        "\"thumbnail_url\":\"http://url.to/thumnail.jpg\"," + 
+	        "\"name\":\"thumb2.jpg\"," + 
+	        "\"type\":\"image/jpeg\"," + 
+	        "\"size\":\"46353\"," + 
+	        "\"delete_url\":\"http://url.to/delete/file/\"," + 
+	        "\"delete_type\":\"DELETE\"" + 
+	      "}]}";
+		
+
+		//System.out.println(arraybuilder.build().toString());
+		//return arraybuilder.build().toString();
+		return ret;
+
 	}
 
 	/*
@@ -358,5 +572,5 @@ public class Application extends ResourceConfig  {
 	 */
 
 
-		
+
 }

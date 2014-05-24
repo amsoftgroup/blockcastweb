@@ -21,12 +21,12 @@
             <param-value>me.blockcast.web</param-value>
         </init-param>
  
-        <!-- Enable Tracing support. -->
+ <!-- Enable Tracing support.
         <init-param>
             <param-name>jersey.config.server.tracing</param-name>
             <param-value>ALL</param-value>
         </init-param>
- 
+  -->
         <load-on-startup>1</load-on-startup>
     </servlet>
  
