@@ -113,6 +113,25 @@
 			<scope>runtime</scope>
 		</dependency>
 
+	<!-- Google Maps -->
+	<dependency>
+		<groupId>com.google.apis</groupId>
+		<artifactId>google-api-services-mapsengine</artifactId>
+		<version>v1-rev15-1.18.0-rc</version>
+	</dependency>
+	<dependency>
+		<groupId>com.google.maps</groupId>
+		<artifactId>mapsengine-api-java-wrapper</artifactId>
+		<version>0.1</version>
+	</dependency>
+
+	<!-- http://stackoverflow.com/questions/20085687/messagebodywriter-not-found-for-media-type-application-json-glassfish -->
+	<dependency>
+		<groupId>com.owlike</groupId>
+		<artifactId>genson</artifactId>
+		<version>0.99</version>
+	</dependency>
+		
 		<!-- For PostgreSQL up to 9.1, use: -->
 
 		<dependency>

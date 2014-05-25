@@ -12,20 +12,26 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.postgresql.geometric.PGpoint;
 
 import me.blockcast.database.postgres.Database;
 import me.blockcast.web.pojo.Post;
 
 public class BlockcastManager {
+	
+	private static Log log = LogFactory.getLog(BlockcastManager.class);
 
 	public static ArrayList<Post> getPostWithinRadius(int distance, double lon, double lat){
 
 		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  " +
 				"id, content, parent_id, post_timestamp from op ";
-		sql += " WHERE st_dwithin(location, ST_MakePoint(?,?), ? )" +
+		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" +
 				" order by dist_meters asc";
 
+		
+		
 		ArrayList<Post> ets = new ArrayList<Post>();
 
 		PreparedStatement ps =  null;
@@ -38,7 +44,7 @@ public class BlockcastManager {
 			c = d.getConnection();
 
 			ps = c.prepareStatement(sql);
-			System.out.println("SQL: " + sql);
+			
 			ps.setDouble(1, lon);
 			ps.setDouble(2, lat);
 			ps.setDouble(3, lon);
@@ -46,7 +52,7 @@ public class BlockcastManager {
 			ps.setInt(5, distance);
 
 			ResultSet rs = ps.executeQuery();
-
+			
 			while( rs.next() ){		
 				Post op = new Post();
 				op.setContent(rs.getString("content"));

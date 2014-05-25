@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public class Database {
 
-	//private static String host = "localhost";
-	private static String host = "blockcast.me";
+	private static String host = "localhost";
+	//private static String host = "blockcast.me";
 	private static int port = 5432;
 	private static String database = "blockcast";
 	private static String user = "blockcast";
