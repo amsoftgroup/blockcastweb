@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -51,6 +52,7 @@ import javax.ws.rs.core.UriInfo;
 import me.blockcast.data.BlockcastManager;
 import me.blockcast.web.pojo.Location;
 import me.blockcast.web.pojo.Post;
+import me.bockcast.utils.Utils;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -79,9 +81,8 @@ import org.json.JSONObject;
 @Path("/")
 public class Application extends ResourceConfig  {
 
-	private Logger logger = Logger.getLogger("MyLog");  
-	private String timeformat = "yyyy/MM/dd HH:mm:ss";
-	private SimpleDateFormat df = new SimpleDateFormat(timeformat);  
+	private Logger logger = Logger.getLogger(Application.class.getName());  
+	private SimpleDateFormat sdf = new SimpleDateFormat(Utils.timeformat);  
 
 	public Application(){
 		register(MultiPartFeature.class);
@@ -150,10 +151,11 @@ public class Application extends ResourceConfig  {
 					post.setDuration(Long.valueOf(value));
 				}else if ("time".equalsIgnoreCase(name)){
 					try {
-						post.setPostTimestamp(df.parse(value));
+						post.setPostTimestamp(sdf.parse(value));
 					} catch (ParseException e) {
-						System.out.println("Application ParseException: " + e.toString());
+						logger.log(Level.SEVERE, e.toString());
 					}
+					//post.setPostTimestamp(Timestamp.valueOf(value));
 				}else if ("lon".equalsIgnoreCase(name)){
 					lon = (Double.valueOf(value));
 				}else if ("lat".equalsIgnoreCase(name)){
@@ -423,9 +425,12 @@ ret jarraybuilder.build().toString();
 
 		// Commons file upload classes are specifically instantiated
 		
-		//DiskFileItemFactory factory = new DiskFileItemFactory();
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		logger.info("setSizeThreshold=" + factory.getSizeThreshold());
+		factory.setSizeThreshold(100000000);
+		logger.info("NEW setSizeThreshold=" + factory.getSizeThreshold());
 		
-		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+		ServletFileUpload upload = new ServletFileUpload(factory);
 
 		String portUrl = "";
 		if (request.getServerPort() != 80){
@@ -531,8 +536,8 @@ ret jarraybuilder.build().toString();
 		
 
 		//System.out.println(arraybuilder.build().toString());
-		//return arraybuilder.build().toString();
-		return ret;
+		return arraybuilder.build().toString();
+		//return ret;
 
 	}
 

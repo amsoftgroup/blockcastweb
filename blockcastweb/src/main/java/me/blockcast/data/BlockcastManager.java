@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -18,11 +19,14 @@ import org.postgresql.geometric.PGpoint;
 
 import me.blockcast.database.postgres.Database;
 import me.blockcast.web.pojo.Post;
+import me.bockcast.utils.Utils;
 
 public class BlockcastManager {
 	
 	private static Log log = LogFactory.getLog(BlockcastManager.class);
-
+	private static String timeformat = "yyyy/MM/dd HH:mm:ss";
+	private static SimpleDateFormat sdf = new SimpleDateFormat(Utils.timeformat); 
+	
 	public static ArrayList<Post> getPostWithinRadius(int distance, double lon, double lat){
 
 		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  " +
@@ -30,8 +34,6 @@ public class BlockcastManager {
 		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" +
 				" order by dist_meters asc";
 
-		
-		
 		ArrayList<Post> ets = new ArrayList<Post>();
 
 		PreparedStatement ps =  null;
@@ -58,9 +60,10 @@ public class BlockcastManager {
 				op.setContent(rs.getString("content"));
 				op.setId(rs.getInt("id"));
 				op.setParentId(rs.getInt("parent_id"));
-				op.setPostTimestamp(rs.getDate("post_timestamp"));
+				java.util.Date date = rs.getTimestamp("post_timestamp");
+				sdf.format(date);
+				op.setPostTimestamp(date);
 				op.setDistance(rs.getLong("dist_meters"));
-				//System.out.println( "dist_meters:" + op.getDistance()) ;
 				ets.add(op);
 			}
 

@@ -12,7 +12,7 @@ public class Database {
 	private static String database = "blockcast";
 	private static String user = "blockcast";
 	private static String password = "Cym4ge!!Cym4ge!!";
-
+	//private static String password = "elculo";
 	private static String TAG = "Database";
 	
 	//Static class instantiation

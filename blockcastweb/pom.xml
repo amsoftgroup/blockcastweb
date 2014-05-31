@@ -8,6 +8,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>blockcastweb Maven Webapp</name>
 	<url>http://maven.apache.org</url>
+	
+	<parent>
+    	<groupId>org.springframework.boot</groupId>
+   		<artifactId>spring-boot-starter-parent</artifactId>
+    	<version>1.0.2.RELEASE</version>
+	</parent>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -99,7 +106,7 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
-		<!-- ADDED -->
+
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
@@ -113,25 +120,25 @@
 			<scope>runtime</scope>
 		</dependency>
 
-	<!-- Google Maps -->
-	<dependency>
-		<groupId>com.google.apis</groupId>
-		<artifactId>google-api-services-mapsengine</artifactId>
-		<version>v1-rev15-1.18.0-rc</version>
-	</dependency>
-	<dependency>
-		<groupId>com.google.maps</groupId>
-		<artifactId>mapsengine-api-java-wrapper</artifactId>
-		<version>0.1</version>
-	</dependency>
+		<!-- Google Maps -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-mapsengine</artifactId>
+			<version>v1-rev15-1.18.0-rc</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.maps</groupId>
+			<artifactId>mapsengine-api-java-wrapper</artifactId>
+			<version>0.1</version>
+		</dependency>
 
-	<!-- http://stackoverflow.com/questions/20085687/messagebodywriter-not-found-for-media-type-application-json-glassfish -->
-	<dependency>
-		<groupId>com.owlike</groupId>
-		<artifactId>genson</artifactId>
-		<version>0.99</version>
-	</dependency>
-		
+		<!-- http://stackoverflow.com/questions/20085687/messagebodywriter-not-found-for-media-type-application-json-glassfish -->
+		<dependency>
+			<groupId>com.owlike</groupId>
+			<artifactId>genson</artifactId>
+			<version>0.99</version>
+		</dependency>
+
 		<!-- For PostgreSQL up to 9.1, use: -->
 
 		<dependency>
@@ -144,6 +151,20 @@
 			<version>VERSION</version> </dependency> -->
 
 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.0.5.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.hateoas</groupId>
+			<artifactId>spring-hateoas</artifactId>
+			<version>0.12.0.RELEASE</version>
+		</dependency>
+   		<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-web</artifactId>
+    	</dependency>
 	</dependencies>
 	<build>
 		<finalName>blockcastweb</finalName>
