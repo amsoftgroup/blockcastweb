@@ -111,6 +111,15 @@ public class Application extends ResourceConfig  {
 	}
 
 	@GET
+	@Path("/getPosts")
+	@Produces({"application/json", "text/xml"})
+	public List<Post> getEntitys() {
+		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
+
+		return BlockcastManager.getPosts();
+	}
+	
+	@GET
 	@Path("/insertPost")
 	@Produces(MediaType.TEXT_HTML)
 	public String insertPost() {

@@ -8,14 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.postgresql.geometric.PGpoint;
+
+import org.springframework.beans.BeanUtils;
 
 import me.blockcast.database.postgres.Database;
 import me.blockcast.web.pojo.Post;
@@ -92,10 +89,72 @@ public class BlockcastManager {
 		ps = null;
 		c = null;
 		d = null;
-		
+		//BeanUtils.copyProperties(ets, target);
 		return ets;
 	}
 
+	public static ArrayList<Post> getPosts(){
+
+		String sql = "SELECT ST_Distance_Sphere(location , ST_SetSRID(ST_MakePoint(34,34),4326)  ) as dist_meters,  " +
+				"id, content, parent_id, post_timestamp from op ";
+		sql += " WHERE ST_Distance_Sphere(location, ST_SetSRID(ST_MakePoint(34,34), 4326) ) < 1000000000" +
+				" order by dist_meters asc";
+
+		ArrayList<Post> ets = new ArrayList<Post>();
+
+		PreparedStatement ps =  null;
+		Connection c = null;
+
+		Database d = new Database();
+
+		try {
+
+			c = d.getConnection();
+
+			ps = c.prepareStatement(sql);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while( rs.next() ){		
+				Post op = new Post();
+				op.setContent(rs.getString("content"));
+				op.setId(rs.getInt("id"));
+				op.setParentId(rs.getInt("parent_id"));
+				java.util.Date date = rs.getTimestamp("post_timestamp");
+				sdf.format(date);
+				op.setPostTimestamp(date);
+				op.setDistance(rs.getLong("dist_meters"));
+				ets.add(op);
+			}
+
+			rs.close();
+			ps.close();
+			c.close();
+		}
+		catch( SQLException se )
+		{
+			System.out.println( "SQL Exception:" ) ;
+
+			while( se != null )
+			{
+				System.out.println( "State  : " + se.getSQLState()  ) ;
+				System.out.println( "Message: " + se.getMessage()   ) ;
+				System.out.println( "Error  : " + se.getErrorCode() ) ;
+
+				se = se.getNextException() ;
+			}
+		}
+		catch( Exception e )
+		{
+			System.out.println( e ) ;
+		}
+
+		ps = null;
+		c = null;
+		d = null;
+
+		return ets;
+	}
 
 	public static void insertPost(Post post){
 
@@ -105,7 +164,7 @@ public class BlockcastManager {
 		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters) " + 
 				//"VALUES(ST_GeomFromText('POINT(" + lon + " " +  lat + ")', 4326), ? , -1, CURRENT_TIMESTAMP);";
 				//"VALUES(ST_GeomFromText(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
-				"VALUES(ST_MakePoint(?, ?), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
+				"VALUES(ST_SetSRID(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
 		PreparedStatement ps =  null;
 		Connection c = null;
 
