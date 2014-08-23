@@ -15,6 +15,8 @@ public class Post implements java.io.Serializable {
 
 	private long id;
 	private Location location;
+	private double lat;
+	private double lon;
 	private String content;
 	private long parentId;
 	private Date postTimestamp;
@@ -104,4 +106,20 @@ public class Post implements java.io.Serializable {
 		return sdf.format(this.postTimestamp);
 	}
 
+	public double getLon() {
+		return lon;
+	}
+
+	public void setLon(double lon) {
+		this.lon = lon;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+	
 }

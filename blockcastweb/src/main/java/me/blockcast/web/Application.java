@@ -182,11 +182,11 @@ public class Application extends ResourceConfig  {
 	}
 
 	@POST
-	@Path("/insertPost/{lon}/{lat}/{parent_id}")
+	@Path("/insertPost/{lat}/{lon}/{parent_id}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void insertPost(@PathParam("parent_id") int parent_id,
-			@PathParam("lon") double lon,
-			@PathParam("lat") double lat
+			@PathParam("lat") double lat,
+			@PathParam("lon") double lon
 			) {
 
 		//FormDataMultiPart contentbp = data;

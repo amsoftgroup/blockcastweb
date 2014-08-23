@@ -26,8 +26,8 @@ public class BlockcastManager {
 	
 	public static ArrayList<Post> getPostWithinRadius(int distance, double lon, double lat){
 
-		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  " +
-				"id, content, parent_id, post_timestamp from op ";
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, " +
+				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat from op ";
 		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" +
 				" order by dist_meters asc";
 
@@ -61,6 +61,7 @@ public class BlockcastManager {
 				sdf.format(date);
 				op.setPostTimestamp(date);
 				op.setDistance(rs.getLong("dist_meters"));
+				op.setDuration(rs.getLong("post_duration"));
 				ets.add(op);
 			}
 
@@ -95,8 +96,8 @@ public class BlockcastManager {
 
 	public static ArrayList<Post> getPosts(){
 
-		String sql = "SELECT ST_Distance_Sphere(location , ST_SetSRID(ST_MakePoint(34,34),4326)  ) as dist_meters,  " +
-				"id, content, parent_id, post_timestamp from op ";
+		String sql = "SELECT ST_Distance_Sphere(location , ST_SetSRID(ST_MakePoint(34,34),4326)  ) as dist_meters, post_duration, " +
+				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat  from op ";
 		sql += " WHERE ST_Distance_Sphere(location, ST_SetSRID(ST_MakePoint(34,34), 4326) ) < 1000000000" +
 				" order by dist_meters asc";
 
@@ -124,6 +125,9 @@ public class BlockcastManager {
 				sdf.format(date);
 				op.setPostTimestamp(date);
 				op.setDistance(rs.getLong("dist_meters"));
+				op.setDuration(rs.getLong("post_duration"));
+				op.setLat(rs.getDouble("lat"));
+				op.setLon(rs.getDouble("lon"));
 				ets.add(op);
 			}
 
