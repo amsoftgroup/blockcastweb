@@ -1,0 +1,16 @@
+body {
+    background-color: #000000;
+}
+
+#header {
+  background: #000000;
+  position: relative; top: 0; left: 0;
+}
+
+#title .ui-bar-a {
+  color: blue;
+}
+
+#title .ui-bar-a .ui-link-inherit {
+  color: orange;
+}

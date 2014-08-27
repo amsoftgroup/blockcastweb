@@ -109,7 +109,7 @@ public class Application extends ResourceConfig  {
 
 		return BlockcastManager.getPostWithinRadius(distance, lon, lat);
 	}
-
+	
 	@GET
 	@Path("/getPosts")
 	@Produces({"application/json", "text/xml"})
@@ -118,6 +118,19 @@ public class Application extends ResourceConfig  {
 
 		return BlockcastManager.getPosts();
 	}
+	
+	@GET
+	@Path("/getPostsByDistanceAndDuration/{distance}/{lat}/{lon}")
+	@Produces({"application/json", "text/xml"})
+	public List<Post> getPostsByDistanceAndDuration(
+			@PathParam("distance") int distance,
+			@PathParam("lat") double lat,
+			@PathParam("lon") double lon) {
+
+		return BlockcastManager.getPostWithinRadiusAndDuration(distance, lat, lon);
+	}
+	
+	
 	
 	@GET
 	@Path("/insertPost")

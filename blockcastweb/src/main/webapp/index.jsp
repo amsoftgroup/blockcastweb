@@ -2,10 +2,22 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="./js/leaflet-0.7.3/leaflet.css" />
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+	<!-- <link rel="stylesheet" href="./js/leaflet-0.7.3/leaflet.css" />-->
 	<link rel="stylesheet" href="./css/MarkerCluster.css" />
 	<link rel="stylesheet" href="./css/MarkerCluster.Default.css" />
 	<link rel="stylesheet" href="./css/application.css" />
+	<style>
+		.mycluster {
+			width: 40px;
+			height: 40px;
+			background-color: black;
+			color: white;
+			text-align: center;
+			font-size: 24px;
+		}
+	</style>
 </head>
 <body>
   <div id="header">

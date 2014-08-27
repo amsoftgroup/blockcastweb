@@ -94,6 +94,78 @@ public class BlockcastManager {
 		return ets;
 	}
 
+	public static ArrayList<Post> getPostWithinRadiusAndDuration(int distance, double lat, double lon){
+
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, " +
+				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat from op ";
+		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" + 
+				"AND ((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp ))) < post_duration)" +
+				" order by dist_meters asc";
+
+		ArrayList<Post> ets = new ArrayList<Post>();
+
+		PreparedStatement ps =  null;
+		Connection c = null;
+
+		Database d = new Database();
+
+		try {
+
+			c = d.getConnection();
+
+			ps = c.prepareStatement(sql);
+			
+			ps.setDouble(1, lon);
+			ps.setDouble(2, lat);
+			ps.setDouble(3, lon);
+			ps.setDouble(4, lat);	
+			ps.setInt(5, distance);
+
+			ResultSet rs = ps.executeQuery();
+			
+			while( rs.next() ){		
+				Post op = new Post();
+				op.setContent(rs.getString("content"));
+				op.setId(rs.getInt("id"));
+				op.setParentId(rs.getInt("parent_id"));
+				java.util.Date date = rs.getTimestamp("post_timestamp");
+				sdf.format(date);
+				op.setPostTimestamp(date);
+				op.setDistance(rs.getLong("dist_meters"));
+				op.setDuration(rs.getLong("post_duration"));
+				ets.add(op);
+			}
+
+			rs.close();
+			ps.close();
+			c.close();
+		}
+		catch( SQLException se )
+		{
+			System.out.println( "SQL Exception:" ) ;
+
+			while( se != null )
+			{
+				System.out.println( "State  : " + se.getSQLState()  ) ;
+				System.out.println( "Message: " + se.getMessage()   ) ;
+				System.out.println( "Error  : " + se.getErrorCode() ) ;
+
+				se = se.getNextException() ;
+			}
+		}
+		catch( Exception e )
+		{
+			System.out.println( e ) ;
+		}
+
+		ps = null;
+		c = null;
+		d = null;
+		//BeanUtils.copyProperties(ets, target);
+		return ets;
+	}
+
+	
 	public static ArrayList<Post> getPosts(){
 
 		String sql = "SELECT ST_Distance_Sphere(location , ST_SetSRID(ST_MakePoint(34,34),4326)  ) as dist_meters, post_duration, " +
