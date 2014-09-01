@@ -91,40 +91,92 @@ $(function () {
 	}
 */
 	
-
+	var refreshId = setInterval(markPosts(), 5000);
+/*	
 	var markers = L.markerClusterGroup();
-	/*
-	var markers = L.markerClusterGroup({
-		maxClusterRadius: 120,
-		iconCreateFunction: function (cluster) {
-			var markers = cluster.getAllChildMarkers();
-			var n = 0;
-			for (var i = 0; i < markers.length; i++) {
-				n += markers[i].number;
-			}
-			return L.divIcon({ html: n, className: 'mycluster', iconSize: L.point(40, 40) });
-		},
-		//Disable all of the defaults:
-		//spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
-	});
-	*/
+
 	var posts = getPosts();
 	
 	for (var i = 0; i < posts.length; i++) {
 		var a = posts[i];
 		var title = posts[i].content;
+		var seconds = posts[i].sec_remaining;
+		var postcolor = '#ff7800';
+		if (seconds < 60){
+			postcolor = '#ff0000';
+		}else if (seconds < 3600){
+			postcolor = '#ffcc00';
+		}
+
+		//
+		var latlng = L.latLng(posts[i].lat, posts[i].lon);
+		var circleMarker = new L.CircleMarker(latlng, posts[i].distance, {
+			color: postcolor,
+	        weight: 1,
+	        opacity: 1,
+	        fillOpacity: 0.6,
+	    });
+		circleMarker.bindPopup('test data <br>' + 
+		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
+		  		posts[i].postTimeString + '<br>' +
+		  		posts[i].duration + ' second post<br>' +
+		  		posts[i].sec_remaining + ' seconds remaining<br>' +
+		  		posts[i].distance + ' meters<br>');
+		markers.addLayer(circleMarker);
+		//
+	}
+
+	map.addLayer(markers);
+*/
+	
+	
+});
+
+function markPosts(){
+	
+	var markers = L.markerClusterGroup();
+
+	var posts = getPosts();
+	
+	for (var i = 0; i < posts.length; i++) {
+
+		var title = posts[i].content;
+		var seconds = posts[i].sec_remaining;
+		var postcolor = '#ff7800';
+		if (seconds < 60){
+			postcolor = '#ff0000';
+		}else if (seconds < 3600){
+			postcolor = '#ffcc00';
+		}
+		/*
 		var marker = L.marker(new L.LatLng(posts[i].lat, posts[i].lon), { title: title });
-		marker.bindPopup( '<a href="' + posts[i].url + '" target="_blank">' + posts[i].content + '</a><br>' + 
+		marker.bindPopup('test data <br>' + 
 		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
 		  		posts[i].postTimeString + '<br>' +
 		  		posts[i].duration);
 		markers.addLayer(marker);
+		*/
+		
+		//
+		var latlng = L.latLng(posts[i].lat, posts[i].lon);
+		var circleMarker = new L.CircleMarker(latlng, posts[i].distance, {
+			color: postcolor,
+	        weight: 1,
+	        opacity: 1,
+	        fillOpacity: 0.6,
+	    });
+		circleMarker.bindPopup('test data <br>' + 
+		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
+		  		posts[i].postTimeString + '<br>' +
+		  		posts[i].duration + ' second post<br>' +
+		  		posts[i].sec_remaining + ' seconds remaining<br>' +
+		  		posts[i].distance + ' meters<br>');
+		markers.addLayer(circleMarker);
+		//
 	}
 
 	map.addLayer(markers);
-	
-	
-});
+}
 
 $('#actions').find('a').on('click', function() {
   locateUser();

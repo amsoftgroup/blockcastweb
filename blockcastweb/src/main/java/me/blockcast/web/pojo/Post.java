@@ -23,6 +23,8 @@ public class Post implements java.io.Serializable {
 	private String postTimeString;
 	private long duration;
 	private long distance;
+	private int sec_remaining;
+
 
 	private static SimpleDateFormat sdf = new SimpleDateFormat(Utils.timeformat);
 	
@@ -121,5 +123,12 @@ public class Post implements java.io.Serializable {
 	public void setLat(double lat) {
 		this.lat = lat;
 	}
-	
+	public int getSec_remaining() {
+		return sec_remaining;
+	}
+
+	public void setSec_remaining(int sec_remaining) {
+		this.sec_remaining = sec_remaining;
+	}
+
 }

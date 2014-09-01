@@ -99,15 +99,15 @@ public class Application extends ResourceConfig  {
 	}
 
 	@GET
-	@Path("/getPostsByDistance/{distance}/{lon}/{lat}")
+	@Path("/getPostsByDistance/{distance}/{lat}/{lon}")
 	@Produces({"application/json", "text/xml"})
 	public List<Post> getEntityByDistance(@PathParam("id") int entityTypeId,
 			@PathParam("distance") int distance,
-			@PathParam("lon") double lon,
-			@PathParam("lat") double lat) {
+			@PathParam("lat") double lat,
+			@PathParam("lon") double lon) {
 		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
 
-		return BlockcastManager.getPostWithinRadius(distance, lon, lat);
+		return BlockcastManager.getPostWithinRadius(distance, lat, lon);
 	}
 	
 	@GET
