@@ -35,34 +35,6 @@
 	<script src="./js/jquery-2.1.1/jquery-2.1.1.js"></script>
 	<script src="./js/application.js"></script>
 <%!
-private String makeSentence(){
-
-	String article[]={"the","a","one","some"};
-	String noun[]={"boy","girl","dog","town","car"};
-	String verb[]={"drove","jumped","ran","walked","skipped"};
-	String preposition[]={"to","from","over","under","on"};
-	StringBuffer sb = new StringBuffer();
-	
-	for (int i = 0; i < 20; i++)
-	{
-
-		sb.append(article[randInt(0,3)]);
-		sb.append(" ");
-		sb.append(noun[randInt(0,4)]);
-		sb.append(" ");
-		sb.append(verb[randInt(0,4)]);
-		sb.append(" ");
-		sb.append(preposition[randInt(0,4)]);
-		sb.append(" ");
-		sb.append(article[randInt(0,3)]);
-		sb.append(" ");
-		sb.append(noun[randInt(0,4)]);
-		sb.append(" ");
-	}
-	
-	return sb.toString();
-}
-
 public static int randInt(int min, int max) {
 
     // NOTE: Usually this should be a field rather than a method
@@ -74,7 +46,8 @@ public static int randInt(int min, int max) {
     int randomNum = rand.nextInt((max - min) + 1) + min;
 
     return randomNum;
-}%>
+}
+%>
 <%
 for (int i = 0; i<randInt(5,10); i++) {
 	Post post = new Post();
@@ -85,12 +58,12 @@ for (int i = 0; i<randInt(5,10); i++) {
 	location.setLat(lat);
 	location.setLon(lon);
 	post.setLocation(location);
-	post.setContent(makeSentence());
+	post.setContent("test content " + i);
 	post.setDuration(randInt(3600, 86400));
-	post.setDistance((long)(100 * Math.random()));
+	post.setDistance((long)(2000 * Math.random()));
 	BlockcastManager.insertPost(post);
 	
-/*
+
 	//Paris
 	lat = Math.random() + 48.34935;
 	lon = Math.random() + 1.74558;
@@ -106,7 +79,6 @@ for (int i = 0; i<randInt(5,10); i++) {
 	location.setLon(lon);
 	post.setLocation(location);
 	BlockcastManager.insertPost(post);
-*/
 	
 }
 %>

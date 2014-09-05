@@ -24,6 +24,7 @@ public class Post implements java.io.Serializable {
 	private long duration;
 	private long distance;
 	private int sec_remaining;
+	private int sec_elapsed;
 
 
 	private static SimpleDateFormat sdf = new SimpleDateFormat(Utils.timeformat);
@@ -130,5 +131,15 @@ public class Post implements java.io.Serializable {
 	public void setSec_remaining(int sec_remaining) {
 		this.sec_remaining = sec_remaining;
 	}
+
+	public int getSec_elapsed() {
+		return sec_elapsed;
+	}
+
+	public void setSec_elapsed(int sec_elapsed) {
+		this.sec_elapsed = sec_elapsed;
+	}
+
+
 
 }

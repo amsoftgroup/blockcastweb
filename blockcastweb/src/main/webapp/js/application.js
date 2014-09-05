@@ -2,25 +2,7 @@
 var map = L.map('map').setView([38.8951, -77.0367], 13);
 var servername = "http://www.blockcast.me";
 var api = "/restapiv1.0/";
-//var posts = -1;
-/*
-$.getJSON(servername + api + "getPosts", function(resultList){
-    $.each(resultList, function(key, val) {
-         alert("JSON Data: key" + key + " value: " + value);
-    });
-}); 
-*/
 
-/*
-function testAjax() {
-	return $.ajax({
-	      url: servername + api + "getPosts"
-	});
-}
-posts.success(function (data) {
-	alert(data);
-});
-*/
 function getPosts(){
 	var result="";
 	$.ajax({ 
@@ -37,6 +19,9 @@ function getPosts(){
 
 $(function () {
 
+	var date = new Date();
+	//var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    
 	L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 		noWrap: false,
 		maxZoom: 18,
@@ -54,7 +39,7 @@ $(function () {
 	function onMapClick(e) {
 		popup
 			.setLatLng(e.latlng)
-			.setContent("You clicked the map at " + e.latlng.toString())
+			.setContent("There are no posts visible near " + e.latlng.toString() + " @ " + date )
 			.openOn(map);
 	}
 
@@ -148,30 +133,38 @@ function markPosts(){
 		}else if (seconds < 3600){
 			postcolor = '#ffcc00';
 		}
+		
 		/*
 		var marker = L.marker(new L.LatLng(posts[i].lat, posts[i].lon), { title: title });
 		marker.bindPopup('test data <br>' + 
 		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
 		  		posts[i].postTimeString + '<br>' +
-		  		posts[i].duration);
+		  		posts[i].duration + ' second post<br>' +
+		  		posts[i].sec_elapsed + ' seconds elapsed<br>' +
+		  		posts[i].sec_remaining + ' seconds remaining<br>' +
+		  		posts[i].distance + ' meters<br>');
 		markers.addLayer(marker);
 		*/
 		
 		//
+	
 		var latlng = L.latLng(posts[i].lat, posts[i].lon);
-		var circleMarker = new L.CircleMarker(latlng, posts[i].distance, {
+		var circleMarker = new L.Circle(latlng, posts[i].distance, {
 			color: postcolor,
 	        weight: 1,
 	        opacity: 1,
 	        fillOpacity: 0.6,
 	    });
-		circleMarker.bindPopup('test data <br>' + 
+		circleMarker.bindPopup(title + '<br>' + 
 		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
 		  		posts[i].postTimeString + '<br>' +
 		  		posts[i].duration + ' second post<br>' +
+		  		posts[i].sec_elapsed + ' seconds elapsed<br>' +
 		  		posts[i].sec_remaining + ' seconds remaining<br>' +
-		  		posts[i].distance + ' meters<br>');
+		  		posts[i].distance + ' meter radius<br>');
+		
 		markers.addLayer(circleMarker);
+	
 		//
 	}
 

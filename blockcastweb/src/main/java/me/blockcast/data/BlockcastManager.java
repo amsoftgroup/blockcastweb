@@ -26,6 +26,7 @@ public class BlockcastManager {
 	
 	public static ArrayList<Post> getPostWithinRadius(int distance, double lat, double lon){
 
+		
 		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, " +
 				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat from op ";
 		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" +
@@ -96,12 +97,22 @@ public class BlockcastManager {
 
 	public static ArrayList<Post> getPostWithinRadiusAndDuration(int distance, double lat, double lon){
 
+		//String sql = "SELECT post_radius_meters as dist_meters, post_duration, round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +  
+		//Use line below for actual distance to points instead of radius post
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration,   round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +
+		" id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat , " +
+		" from op " + 
+		" GROUP BY id " + 
+		" HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration " + 
+		" order by dist_meters asc ";
+		
+/*
 		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration,  round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_remaining,  " +
 				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat from op ";
 		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" + 
 				"AND ((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp ))) > post_duration)" +
 				" order by dist_meters asc";
-
+*/
 		ArrayList<Post> ets = new ArrayList<Post>();
 
 		PreparedStatement ps =  null;
@@ -168,17 +179,17 @@ public class BlockcastManager {
 
 	
 	public static ArrayList<Post> getPosts(){
-/*
-		String sql = "SELECT ST_Distance_Sphere(location , ST_SetSRID(ST_MakePoint(34,34),4326)  ) as dist_meters, post_duration, " +
-				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat  from op ";
-		sql += " WHERE ST_Distance_Sphere(location, ST_SetSRID(ST_MakePoint(34,34), 4326) ) < 1000000000" +
-				" order by dist_meters asc";
-*/
-		//to test, just return distance specified in the DB, not distance from current location
-		String sql = "SELECT post_radius_meters as dist_meters, post_duration, round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_remaining, " +
-		"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat  from op " +
-		" WHERE ((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp ))) > post_duration)" +
-		" order by dist_meters asc";
+		
+		//Use line below for actual distance to points instead of radius post
+		//String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration,   round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +
+		String sql = "SELECT post_radius_meters as dist_meters, post_duration, round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +  
+		" id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat , " +
+		" round( (SELECT EXTRACT(EPOCH FROM post_timestamp )) + post_duration - (SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))))) as sec_remaining" + 
+		" from op " + 
+		" GROUP BY id " + 
+		" HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration " + 
+		" order by dist_meters asc ";
+		
 		ArrayList<Post> ets = new ArrayList<Post>();
 
 		PreparedStatement ps =  null;
@@ -207,6 +218,7 @@ public class BlockcastManager {
 				op.setLat(rs.getDouble("lat"));
 				op.setLon(rs.getDouble("lon"));
 				op.setSec_remaining(rs.getInt("sec_remaining"));
+				op.setSec_elapsed(rs.getInt("sec_elapsed"));
 				ets.add(op);
 			}
 
