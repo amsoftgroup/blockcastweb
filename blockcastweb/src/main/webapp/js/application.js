@@ -158,9 +158,9 @@ function markPosts(){
 		circleMarker.bindPopup(title + '<br>' + 
 		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
 		  		posts[i].postTimeString + '<br>' +
-		  		posts[i].duration + ' second post<br>' +
-		  		posts[i].sec_elapsed + ' seconds elapsed<br>' +
-		  		posts[i].sec_remaining + ' seconds remaining<br>' +
+		  		toDisplayTime(posts[i].duration) + ' post<br>' +
+		  		toDisplayTime(posts[i].sec_elapsed) + ' elapsed<br>' +
+		  		toDisplayTime(posts[i].sec_remaining) + ' remaining<br>' +
 		  		posts[i].distance + ' meter radius<br>');
 		
 		markers.addLayer(circleMarker);
@@ -189,5 +189,42 @@ function locateUser() {
 	  map.on('locationfound', onLocationFound);
 }
 
+function toDisplayTime(seconds){
+	// get total seconds between the times
+	var delta = seconds;
 
+	// calculate (and subtract) whole days
+	var days = Math.floor(delta / 86400);
+	delta -= days * 86400;
 
+	if (days < 10){
+		days = '0' + days;
+	}
+	
+	// calculate (and subtract) whole hours
+	var hours = Math.floor(delta / 3600) % 24;
+	delta -= hours * 3600;
+
+	if (hours < 10){
+		hours = '0' + hours;
+	}
+	
+	// calculate (and subtract) whole minutes
+	var minutes = Math.floor(delta / 60) % 60;
+	delta -= minutes * 60;
+
+	if (minutes < 10){
+		minutes = '0' + minutes;
+	}
+	
+	
+	// what's left is seconds
+	var seconds = delta % 60;  // in theory the modulus is not required
+	
+	if (seconds < 10){
+		seconds = '0' + seconds;
+	}
+	
+	return days + 'd:' + hours + 'h:' + minutes + 'm:' + seconds + 's';
+	
+}
