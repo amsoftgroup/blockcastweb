@@ -101,9 +101,8 @@ public class Application extends ResourceConfig  {
 	@GET
 	@Path("/getPostsByDistance/{distance}/{lat}/{lon}")
 	@Produces({"application/json", "text/xml"})
-	public List<Post> getEntityByDistance(@PathParam("id") int entityTypeId,
-			@PathParam("distance") int distance,
-			@PathParam("lat") double lat,
+	public List<Post> getEntityByDistance(@PathParam("distance") int distance,
+@PathParam("lat") double lat,
 			@PathParam("lon") double lon) {
 		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
 
@@ -121,12 +120,12 @@ public class Application extends ResourceConfig  {
 	
 	@GET
 	@Path("/getPostsByDistanceAndDuration/{distance}/{lat}/{lon}")
-	@Produces({"application/json", "text/xml"})
+	@Produces({"application/json"})
 	public List<Post> getPostsByDistanceAndDuration(
 			@PathParam("distance") int distance,
 			@PathParam("lat") double lat,
 			@PathParam("lon") double lon) {
-
+		logger.info("Calling  BlockcastManager.getPostWithinRadiusAndDuration(" + distance + "," +  lat +","  + lon + ")");
 		return BlockcastManager.getPostWithinRadiusAndDuration(distance, lat, lon);
 	}
 	
@@ -146,7 +145,7 @@ public class Application extends ResourceConfig  {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_HTML)
 	//public String insertPost(@FormDataParam("schema") final String schema) {
-	public String insertPost(FormDataMultiPart formDataMultiPart) {
+	public boolean insertPost(FormDataMultiPart formDataMultiPart) {
 
 		Map<String, List<FormDataBodyPart>> fields = formDataMultiPart.getFields();
 
@@ -189,65 +188,11 @@ public class Application extends ResourceConfig  {
 		location.setLat(lat);
 		location.setLon(lon);
 		post.setLocation(location);	
-		BlockcastManager.insertPost(post);
+		boolean ret = BlockcastManager.insertPost(post);
 
-		return "returned " + formDataMultiPart.getFields().size();
+		return ret;
 	}
 
-	@POST
-	@Path("/insertPost/{lat}/{lon}/{parent_id}")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public void insertPost(@PathParam("parent_id") int parent_id,
-			@PathParam("lat") double lat,
-			@PathParam("lon") double lon
-			) {
-
-		//FormDataMultiPart contentbp = data;
-		//String content = (String)contentbp.getEntity();
-		System.out.println("VALUE=<null>" );
-		/*
-		for (int i = 0; i < data.getBodyParts().size(); i++){
-			BodyPart bodypart = data.getBodyParts().get(i);
-			bodypart.getEntity();
-			 HttpHeaders httpHeaders = bodypart.getHttpHeaders();
-		      UriInfo uriInfo = bodypart.getUriInfo();
-		      String entitySetName = bodypart.getEntitySetName();
-		      String entityId = bodypart.getEntityKey();
-		      String entityString = bodypart.getEntity();
-
-		}
-		 */
-
-		/*
-		double dlon = Double.parseDouble(lon);
-		double dlat = Double.parseDouble(lat);
-		long lparentId = Long.parseLong(parentId);
-		long ldistance = Long.parseLong(distance);
-		Date datetime = null;
-		try {
-			datetime = new SimpleDateFormat(timeformat).parse(time);
-		} catch (ParseException e2) {
-			Log.e(TAG, e2.toString());
-		}
-		long lduration = Long.parseLong(duration);
-		 */
-		Post post = new Post();
-		BlockcastManager.insertPost(post);
-
-	}
-	/*
-	@POST
-	@Path("/insertPost")
-	@Consumes("multipart/mixed")
-	public void insertPost(
-			FormDataMultiPart data
-			) {
-
-			Post post = data.getBodyParts().get(0).getEntityAs(Post.class);
-			BlockcastManager.insertPost(post);
-
-	}
-	 */
 	// This method is called if TEXT_PLAIN is request
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)

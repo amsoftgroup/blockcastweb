@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.beans.BeanUtils;
-
 import me.blockcast.database.postgres.Database;
 import me.blockcast.web.pojo.Post;
 import me.bockcast.utils.Utils;
@@ -99,20 +97,19 @@ public class BlockcastManager {
 
 		//String sql = "SELECT post_radius_meters as dist_meters, post_duration, round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +  
 		//Use line below for actual distance to points instead of radius post
-		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration,   round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +
-		" id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat , " +
-		" from op " + 
-		" GROUP BY id " + 
-		" HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration " + 
-		" order by dist_meters asc ";
 		
-/*
-		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration,  round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_remaining,  " +
-				"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat from op ";
-		sql += " WHERE ST_Distance_Sphere(location, ST_MakePoint(?,?) ) < ?" + 
-				"AND ((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp ))) > post_duration)" +
-				" order by dist_meters asc";
-*/
+		/* ST_MakePoint: x is longitude and y is latitude */
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, " + 
+		"round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " + 
+		"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat " + 
+		"from op " + 
+		"GROUP BY id " +  
+		"HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration  " + 
+		"and (ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) < ?) " + 
+		"order by dist_meters asc";
+		
+		log.info("**********SQL= " + sql + "lat=" + lat + "lon=" + lon + "distance=" + distance);
+
 		ArrayList<Post> ets = new ArrayList<Post>();
 
 		PreparedStatement ps =  null;
@@ -129,11 +126,11 @@ public class BlockcastManager {
 			ps.setDouble(1, lon);
 			ps.setDouble(2, lat);
 			ps.setDouble(3, lon);
-			ps.setDouble(4, lat);	
+			ps.setDouble(4, lat);
 			ps.setInt(5, distance);
-
-			ResultSet rs = ps.executeQuery();
 			
+			ResultSet rs = ps.executeQuery();
+			log.info("**********rs= " + rs.getFetchSize());
 			while( rs.next() ){		
 				Post op = new Post();
 				op.setContent(rs.getString("content"));
@@ -144,7 +141,7 @@ public class BlockcastManager {
 				op.setPostTimestamp(date);
 				op.setDistance(rs.getLong("dist_meters"));
 				op.setDuration(rs.getLong("post_duration"));
-				op.setSec_remaining(rs.getInt("sec_remaining"));
+				//op.setSec_remaining(rs.getInt("sec_remaining"));
 				ets.add(op);
 			}
 
@@ -154,6 +151,7 @@ public class BlockcastManager {
 		}
 		catch( SQLException se )
 		{
+			log.info("**********EXCEPTION= " + se.toString());
 			System.out.println( "SQL Exception:" ) ;
 
 			while( se != null )
@@ -167,13 +165,14 @@ public class BlockcastManager {
 		}
 		catch( Exception e )
 		{
+			log.info("**********EXCEPTION= " + e.toString());
 			System.out.println( e ) ;
 		}
 
 		ps = null;
 		c = null;
 		d = null;
-		//BeanUtils.copyProperties(ets, target);
+		
 		return ets;
 	}
 
@@ -188,7 +187,9 @@ public class BlockcastManager {
 		" from op " + 
 		" GROUP BY id " + 
 		" HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration " + 
-		" order by dist_meters asc ";
+		" order by dist_meters asc " +
+		// throttle response; this is a debug method
+		" limit 100 ";
 		
 		ArrayList<Post> ets = new ArrayList<Post>();
 
@@ -251,8 +252,10 @@ public class BlockcastManager {
 		return ets;
 	}
 
-	public static void insertPost(Post post){
+	public static boolean insertPost(Post post){
 
+		boolean success = false;
+		
 		System.out.println( "post.getContent()  : " + post.getContent()) ;
 		System.out.println( "post.getDistance()  : " + post.getDistance()) ;
 		System.out.println( "post.getDuration()  : " + post.getDuration()) ;
@@ -276,10 +279,10 @@ public class BlockcastManager {
 			ps.setLong(4, post.getDuration());
 			ps.setLong(5, post.getDistance());
 			ps.execute();
-			
+			success = true;
 			ps.close();
 			c.close();
-		
+			
 			
 		}catch( SQLException se ){
 
@@ -302,6 +305,7 @@ public class BlockcastManager {
 		ps = null;
 		c = null;
 		d = null;
+		return success;
 
 	}
 	

@@ -106,20 +106,25 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
-
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
 			<version>7.0</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
 			<version>1.0</version>
 			<scope>runtime</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
 		<!-- Google Maps -->
 		<dependency>
 			<groupId>com.google.apis</groupId>
@@ -150,7 +155,7 @@
 		<!-- or for 9.2+ <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
 			<version>VERSION</version> </dependency> -->
 
-
+<!-- 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -165,6 +170,7 @@
         	<groupId>org.springframework.boot</groupId>
         	<artifactId>spring-boot-starter-web</artifactId>
     	</dependency>
+    	 -->
 	</dependencies>
 	<build>
 		<finalName>blockcastweb</finalName>

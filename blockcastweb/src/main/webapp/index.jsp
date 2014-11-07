@@ -10,16 +10,6 @@
 	<link rel="stylesheet" href="./css/MarkerCluster.css" />
 	<link rel="stylesheet" href="./css/MarkerCluster.Default.css" />
 	<link rel="stylesheet" href="./css/application.css" />
-	<style>
-		.mycluster {
-			width: 40px;
-			height: 40px;
-			background-color: black;
-			color: white;
-			text-align: center;
-			font-size: 24px;
-		}
-	</style>
 </head>
 <body>
   <div id="header">
@@ -32,6 +22,7 @@
 	<script src="./js/leaflet-0.7.3/leaflet.markercluster-src.js"></script>
 	<script src="./js/jquery-2.1.1/jquery-2.1.1.js"></script>
 	<script src="./js/application.js"></script>
+	<script src="./js/util.js"></script>
 <%!
 public static int randInt(int min, int max) {
     Random rand = new Random();
