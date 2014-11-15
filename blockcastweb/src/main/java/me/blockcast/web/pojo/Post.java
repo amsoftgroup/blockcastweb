@@ -19,8 +19,8 @@ public class Post implements java.io.Serializable {
 	private double lon;
 	private String content;
 	private long parentId;
-	private Date postTimestamp;
-	private String postTimeString;
+	private long epoch;
+	//private long postTimeString;
 	private long duration;
 	private long distance;
 	private int sec_remaining;
@@ -39,13 +39,13 @@ public class Post implements java.io.Serializable {
 		this.parentId = parentId;
 	}
 
-	public Post(long id, Location location, String content, long parentId, Date postTimestamp) {
+	public Post(long id, Location location, String content, long parentId, long epoch) {
 	//public Post(long id, Location location, String content, long parentId, String postTimestamp) {
 		this.id = id;
 		this.location = location;
 		this.content = content;
 		this.parentId = parentId;
-		this.postTimestamp = postTimestamp;
+		this.epoch = epoch;
 	}
 
 	public long getId() {
@@ -80,6 +80,7 @@ public class Post implements java.io.Serializable {
 		this.parentId = parentId;
 	}
 
+	/*
 	public Date getPostTimestamp() {
 		return this.postTimestamp;
 	}
@@ -88,7 +89,7 @@ public class Post implements java.io.Serializable {
 		this.postTimestamp = postTimestamp;
 		this.postTimeString = sdf.format(this.postTimestamp);
 	}
-
+*/
 	public long getDistance() {
 		return distance;
 	}
@@ -104,11 +105,18 @@ public class Post implements java.io.Serializable {
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
-
+/*
 	public String getPostTimeString() {
 		return sdf.format(this.postTimestamp);
 	}
-
+*/
+	public long getEpoch() {
+		return this.epoch;
+	}
+	public void setEpoch(long epoch) {
+		this.epoch = epoch;
+	}
+	
 	public double getLon() {
 		return lon;
 	}

@@ -64,10 +64,9 @@ function markPosts(){
 		
 		circleMarker.bindPopup(title + '<br>' + 
 		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
-		  		posts[i].postTimeString + '<br>' +
+		  		posts[i].epoch + ' epoch<br>' +
 		  		toDisplayTime(posts[i].duration) + ' post<br>' +
 		  		toDisplayTime(posts[i].sec_elapsed) + ' elapsed<br>' +
-		  		toDisplayTime(posts[i].sec_remaining) + ' remaining<br>' +
 		  		posts[i].distance + ' meter radius<br>');
 		
 		markers.addLayer(circleMarker);

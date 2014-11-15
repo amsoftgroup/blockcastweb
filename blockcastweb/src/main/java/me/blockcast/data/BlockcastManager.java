@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,9 +57,8 @@ public class BlockcastManager {
 				op.setContent(rs.getString("content"));
 				op.setId(rs.getInt("id"));
 				op.setParentId(rs.getInt("parent_id"));
-				java.util.Date date = rs.getTimestamp("post_timestamp");
-				sdf.format(date);
-				op.setPostTimestamp(date);
+				java.util.Date date = rs.getTimestamp("post_timestamp");				
+				op.setEpoch(date.getTime()/1000l);
 				op.setDistance(rs.getLong("dist_meters"));
 				op.setDuration(rs.getLong("post_duration"));
 				ets.add(op);
@@ -137,11 +137,11 @@ public class BlockcastManager {
 				op.setId(rs.getInt("id"));
 				op.setParentId(rs.getInt("parent_id"));
 				java.util.Date date = rs.getTimestamp("post_timestamp");
-				sdf.format(date);
-				op.setPostTimestamp(date);
+				//sdf.format(date);
+				op.setEpoch(date.getTime()/1000l);
 				op.setDistance(rs.getLong("dist_meters"));
 				op.setDuration(rs.getLong("post_duration"));
-				//op.setSec_remaining(rs.getInt("sec_remaining"));
+				op.setSec_elapsed(rs.getInt("sec_elapsed"));
 				ets.add(op);
 			}
 
@@ -212,8 +212,7 @@ public class BlockcastManager {
 				op.setId(rs.getInt("id"));
 				op.setParentId(rs.getInt("parent_id"));
 				java.util.Date date = rs.getTimestamp("post_timestamp");
-				sdf.format(date);
-				op.setPostTimestamp(date);
+				op.setEpoch(date.getTime()/1000l);
 				op.setDistance(rs.getLong("dist_meters"));
 				op.setDuration(rs.getLong("post_duration"));
 				op.setLat(rs.getDouble("lat"));

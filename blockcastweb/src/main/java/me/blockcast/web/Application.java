@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
+import java.util.UUID;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,10 +64,12 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.BodyPartEntity;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -102,13 +105,13 @@ public class Application extends ResourceConfig  {
 	@Path("/getPostsByDistance/{distance}/{lat}/{lon}")
 	@Produces({"application/json", "text/xml"})
 	public List<Post> getEntityByDistance(@PathParam("distance") int distance,
-@PathParam("lat") double lat,
+			@PathParam("lat") double lat,
 			@PathParam("lon") double lon) {
 		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
 
 		return BlockcastManager.getPostWithinRadius(distance, lat, lon);
 	}
-	
+
 	@GET
 	@Path("/getPosts")
 	@Produces({"application/json", "text/xml"})
@@ -117,7 +120,7 @@ public class Application extends ResourceConfig  {
 
 		return BlockcastManager.getPosts();
 	}
-	
+
 	@GET
 	@Path("/getPostsByDistanceAndDuration/{distance}/{lat}/{lon}")
 	@Produces({"application/json"})
@@ -128,9 +131,9 @@ public class Application extends ResourceConfig  {
 		logger.info("Calling  BlockcastManager.getPostWithinRadiusAndDuration(" + distance + "," +  lat +","  + lon + ")");
 		return BlockcastManager.getPostWithinRadiusAndDuration(distance, lat, lon);
 	}
-	
-	
-	
+
+
+
 	@GET
 	@Path("/insertPost")
 	@Produces(MediaType.TEXT_HTML)
@@ -145,7 +148,7 @@ public class Application extends ResourceConfig  {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_HTML)
 	//public String insertPost(@FormDataParam("schema") final String schema) {
-	public boolean insertPost(FormDataMultiPart formDataMultiPart) {
+	public String insertPost(FormDataMultiPart formDataMultiPart) {
 
 		Map<String, List<FormDataBodyPart>> fields = formDataMultiPart.getFields();
 
@@ -160,28 +163,29 @@ public class Application extends ResourceConfig  {
 
 			for (int i = 0; i < formdatabodyparts.size(); i++){
 				String name = formdatabodyparts.get(i).getName();
-				String value = formdatabodyparts.get(i).getValue();
-				System.out.println(entry.getKey() + " ( " + i + " )/ " + "N" + name + " V"+value);
+
 				if ("content".equalsIgnoreCase(name)){
-					post.setContent(value);
+					post.setContent(formdatabodyparts.get(i).getValue());
 				}else if ("distance".equalsIgnoreCase(name)){
-					post.setDistance(Long.valueOf(value));
+					post.setDistance(Long.valueOf(formdatabodyparts.get(i).getValue()));
 				}else if ("parentId".equalsIgnoreCase(name)){
-					post.setParentId(Long.valueOf(value));
+					post.setParentId(Long.valueOf(formdatabodyparts.get(i).getValue()));
 				}else if ("duration".equalsIgnoreCase(name)){
-					post.setDuration(Long.valueOf(value));
+					post.setDuration(Long.valueOf(formdatabodyparts.get(i).getValue()));
 				}else if ("time".equalsIgnoreCase(name)){
-					try {
-						post.setPostTimestamp(sdf.parse(value));
-					} catch (ParseException e) {
-						logger.log(Level.SEVERE, e.toString());
-					}
-					//post.setPostTimestamp(Timestamp.valueOf(value));
+					long epoch  = Long.parseLong(formdatabodyparts.get(i).getValue()) / 1000l;				
+					post.setEpoch(epoch);
 				}else if ("lon".equalsIgnoreCase(name)){
-					lon = (Double.valueOf(value));
+					lon = (Double.valueOf(formdatabodyparts.get(i).getValue()));
 				}else if ("lat".equalsIgnoreCase(name)){
-					lat = (Double.valueOf(value));
-				}	
+					lat = (Double.valueOf(formdatabodyparts.get(i).getValue()));
+				}else if ("file".equalsIgnoreCase(name)){	
+					UUID uuid = UUID.randomUUID();
+					
+					File f = formdatabodyparts.get(i).getValueAs(File.class);
+					String ext = FilenameUtils.getExtension(f.getPath());
+					f.renameTo(new File("/tmp/" + uuid.toString() + "." + ext));
+				}		
 			}    
 		}
 		Location location = new Location();
@@ -190,7 +194,7 @@ public class Application extends ResourceConfig  {
 		post.setLocation(location);	
 		boolean ret = BlockcastManager.insertPost(post);
 
-		return ret;
+		return "" + ret;
 	}
 
 	// This method is called if TEXT_PLAIN is request
@@ -299,7 +303,7 @@ public class Application extends ResourceConfig  {
 	}
 	 */
 
-	
+
 	/*
 	 * 
 	 * JsonObjectBuilder jsonbuilder = Json.createObjectBuilder();
@@ -359,28 +363,28 @@ jarraybuilder.add(job.build());
 }
 
 ret jarraybuilder.build().toString();
-*/
-	
+	 */
+
 	@GET
 	@Path("upload")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String uploadget(@Context HttpServletRequest request,
 			@Context HttpServletResponse response) throws Exception {
-		
+
 		return "(\"success\": \"true\")";
 	}
-	
+
 	@POST
 	@Path("upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String uploadFile(@Context HttpServletRequest request,
 			@Context HttpServletResponse response) throws Exception {
-		
+
 		JsonObjectBuilder arraybuilder = Json.createObjectBuilder();
 		//String tmpdir = System.getProperty("java.io.tmpdir");
 		String tmpdir = "/opt/tomcat/webapps/ROOT/images/";
-		
+
 		logger.info("in uploadFile: tmpdir=" + tmpdir);
 		File tmpdirfile = new File(tmpdir);
 
@@ -388,25 +392,25 @@ ret jarraybuilder.build().toString();
 		if(!tmpdirfile.exists()) {
 			mkfolder = tmpdirfile.mkdir();
 		}
-		
+
 
 		// Commons file upload classes are specifically instantiated
-		
+
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		logger.info("setSizeThreshold=" + factory.getSizeThreshold());
 		factory.setSizeThreshold(100000000);
 		logger.info("NEW setSizeThreshold=" + factory.getSizeThreshold());
-		
+
 		ServletFileUpload upload = new ServletFileUpload(factory);
 
 		String portUrl = "";
 		if (request.getServerPort() != 80){
-		    portUrl = ":" + request.getServerPort();
+			portUrl = ":" + request.getServerPort();
 		}
 		String restUrl = request.getScheme() + "://" + request.getServerName()
-		+ portUrl + request.getContextPath();
-		
-		
+				+ portUrl + request.getContextPath();
+
+
 		// Parse the request
 		List<FileItem> items = upload.parseRequest(request);
 		boolean ismultipart = ServletFileUpload.isMultipartContent(request);
@@ -415,9 +419,9 @@ ret jarraybuilder.build().toString();
 		logger.info("content_len=" + content_len);
 		JsonArrayBuilder jarraybuilder = Json.createArrayBuilder();
 
-		
+
 		logger.info("items: " + items.size()); 
-		
+
 		Iterator<FileItem> iter = items.iterator();
 
 		//ServletOutputStream out = null;
@@ -426,7 +430,7 @@ ret jarraybuilder.build().toString();
 		String extension = null;
 		int index = -1;
 		int length = -1;
-		
+
 		while (iter.hasNext()) {
 			// Get the current item in the iteration
 			FileItem item = (FileItem) iter.next();
@@ -459,17 +463,17 @@ ret jarraybuilder.build().toString();
 
 				File uploadedFile = new File(tmpdir + File.separator + "TEST.txt");
 				item.write(uploadedFile);
-				
+
 				JsonObjectBuilder builder = Json.createObjectBuilder();
-                builder.add("name", item.getName());
-                builder.add("type", item.getContentType());
-                builder.add("size", item.getSize());
-                builder.add("url", tmpdir + "/" + item.getName());
-                builder.add("thumbnail_url", extension);
-                builder.add("delete_url", tmpdir + "/" + item.getName());
-                builder.add("delete_type", "DELETE");
-                    
-                arraybuilder.add("\"files\"", builder);
+				builder.add("name", item.getName());
+				builder.add("type", item.getContentType());
+				builder.add("size", item.getSize());
+				builder.add("url", tmpdir + "/" + item.getName());
+				builder.add("thumbnail_url", extension);
+				builder.add("delete_url", tmpdir + "/" + item.getName());
+				builder.add("delete_type", "DELETE");
+
+				arraybuilder.add("\"files\"", builder);
 
 			}
 		}
@@ -490,17 +494,17 @@ ret jarraybuilder.build().toString();
 			logger.info("Exception: " + e.toString());  
 		}
 		 */
-		
+
 		String ret = "{\"files\":[{" + 
-	        "\"url\":\"http://url.to/file/or/page\"," + 
-	        "\"thumbnail_url\":\"http://url.to/thumnail.jpg\"," + 
-	        "\"name\":\"thumb2.jpg\"," + 
-	        "\"type\":\"image/jpeg\"," + 
-	        "\"size\":\"46353\"," + 
-	        "\"delete_url\":\"http://url.to/delete/file/\"," + 
-	        "\"delete_type\":\"DELETE\"" + 
-	      "}]}";
-		
+				"\"url\":\"http://url.to/file/or/page\"," + 
+				"\"thumbnail_url\":\"http://url.to/thumnail.jpg\"," + 
+				"\"name\":\"thumb2.jpg\"," + 
+				"\"type\":\"image/jpeg\"," + 
+				"\"size\":\"46353\"," + 
+				"\"delete_url\":\"http://url.to/delete/file/\"," + 
+				"\"delete_type\":\"DELETE\"" + 
+				"}]}";
+
 
 		//System.out.println(arraybuilder.build().toString());
 		return arraybuilder.build().toString();
