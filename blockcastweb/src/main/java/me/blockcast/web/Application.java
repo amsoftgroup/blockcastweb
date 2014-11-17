@@ -1,5 +1,7 @@
 package me.blockcast.web;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import javax.imageio.ImageIO;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
@@ -64,6 +67,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.filter.LoggingFilter;
@@ -76,6 +80,10 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import static org.imgscalr.Scalr.*;
+
+import org.imgscalr.Scalr;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -180,11 +188,52 @@ public class Application extends ResourceConfig  {
 				}else if ("lat".equalsIgnoreCase(name)){
 					lat = (Double.valueOf(formdatabodyparts.get(i).getValue()));
 				}else if ("file".equalsIgnoreCase(name)){	
-					UUID uuid = UUID.randomUUID();
 					
+					UUID uuid = UUID.randomUUID();
+
+					String filename = formdatabodyparts.get(i).getContentDisposition().getFileName();
 					File f = formdatabodyparts.get(i).getValueAs(File.class);
-					String ext = FilenameUtils.getExtension(f.getPath());
-					f.renameTo(new File("/tmp/" + uuid.toString() + "." + ext));
+					
+					logger.info("File f.getName(): " + f.getName());		
+					logger.info("filename: " + filename);
+					
+					String ext = FilenameUtils.getExtension(filename);
+					
+					logger.info("file ext: " + ext);
+					String newfile = Utils.uploadfolder + uuid.toString() + "." + ext;
+					logger.info("newfile: " + newfile);
+					
+					File smallfile = new File( Utils.uploadfolder + uuid.toString() + "_small." + ext);
+					File bigfile = new File( Utils.uploadfolder + uuid.toString() + "_small." + ext);
+					
+					try {
+						FileUtils.copyFile(f, bigfile);
+						FileUtils.copyFile(f, smallfile);
+					} catch (IOException e2) {
+						logger.severe(e2.toString());
+					}
+					
+					BufferedImage image = null;
+					try {
+						image = ImageIO.read(f);
+					} catch (IOException e1) {
+						logger.severe(e1.toString());
+					}
+					
+					BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					Graphics2D g = newImage.createGraphics();
+					g.drawImage(image, 0, 0, null);
+					g.dispose();
+
+					BufferedImage thumbnail = Scalr.resize(image, 150);
+					
+					try {
+					    // retrieve image
+					    BufferedImage bi = thumbnail;					    
+					    ImageIO.write(bi, ext, smallfile);
+					} catch (IOException e) {
+						logger.severe(e.toString());
+					}
 				}		
 			}    
 		}

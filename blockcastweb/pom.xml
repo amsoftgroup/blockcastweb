@@ -8,11 +8,11 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>blockcastweb Maven Webapp</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<parent>
-    	<groupId>org.springframework.boot</groupId>
-   		<artifactId>spring-boot-starter-parent</artifactId>
-    	<version>1.0.2.RELEASE</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.0.2.RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -106,6 +106,13 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.imgscalr</groupId>
+			<artifactId>imgscalr-lib</artifactId>
+			<version>4.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
@@ -124,7 +131,7 @@
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
 		</dependency>
-		
+
 		<!-- Google Maps -->
 		<dependency>
 			<groupId>com.google.apis</groupId>
@@ -155,22 +162,11 @@
 		<!-- or for 9.2+ <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
 			<version>VERSION</version> </dependency> -->
 
-<!-- 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>4.0.5.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.hateoas</groupId>
-			<artifactId>spring-hateoas</artifactId>
-			<version>0.12.0.RELEASE</version>
-		</dependency>
-   		<dependency>
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-starter-web</artifactId>
-    	</dependency>
-    	 -->
+		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-context</artifactId> 
+			<version>4.0.5.RELEASE</version> </dependency> <dependency> <groupId>org.springframework.hateoas</groupId> 
+			<artifactId>spring-hateoas</artifactId> <version>0.12.0.RELEASE</version> 
+			</dependency> <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-web</artifactId> 
+			</dependency> -->
 	</dependencies>
 	<build>
 		<finalName>blockcastweb</finalName>
