@@ -14,7 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import me.blockcast.database.postgres.Database;
-import me.blockcast.web.pojo.Post;
+import me.blockcast.common.Post;
 import me.bockcast.utils.Utils;
 
 public class BlockcastManager {
@@ -89,7 +89,7 @@ public class BlockcastManager {
 		ps = null;
 		c = null;
 		d = null;
-		//BeanUtils.copyProperties(ets, target);
+
 		return ets;
 	}
 
@@ -99,7 +99,7 @@ public class BlockcastManager {
 		//Use line below for actual distance to points instead of radius post
 		
 		/* ST_MakePoint: x is longitude and y is latitude */
-		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, " + 
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, media_file, " + 
 		"round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " + 
 		"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat " + 
 		"from op " + 
@@ -137,11 +137,19 @@ public class BlockcastManager {
 				op.setId(rs.getInt("id"));
 				op.setParentId(rs.getInt("parent_id"));
 				java.util.Date date = rs.getTimestamp("post_timestamp");
-				//sdf.format(date);
 				op.setEpoch(date.getTime()/1000l);
 				op.setDistance(rs.getLong("dist_meters"));
 				op.setDuration(rs.getLong("post_duration"));
-				op.setSec_elapsed(rs.getInt("sec_elapsed"));
+				op.setSec_elapsed(rs.getInt("sec_elapsed"));				
+				String media_file = rs.getString("media_file");
+				if (media_file!=null){
+					log.info("media_file=" + media_file);
+					op.setMedia_name(media_file);
+					String media_name = Utils.getPreview(media_file);
+					op.setMedia_preview(media_name);
+				}else{
+					log.info("media_file IS NULL");
+				}
 				ets.add(op);
 			}
 
@@ -176,12 +184,11 @@ public class BlockcastManager {
 		return ets;
 	}
 
-	
 	public static ArrayList<Post> getPosts(){
 		
 		//Use line below for actual distance to points instead of radius post
 		//String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration,   round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +
-		String sql = "SELECT post_radius_meters as dist_meters, post_duration, round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " +  
+		String sql = "SELECT post_radius_meters as dist_meters, post_duration, round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, media_file, " +  
 		" id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat , " +
 		" round( (SELECT EXTRACT(EPOCH FROM post_timestamp )) + post_duration - (SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))))) as sec_remaining" + 
 		" from op " + 
@@ -219,6 +226,15 @@ public class BlockcastManager {
 				op.setLon(rs.getDouble("lon"));
 				op.setSec_remaining(rs.getInt("sec_remaining"));
 				op.setSec_elapsed(rs.getInt("sec_elapsed"));
+				String media_file = rs.getString("media_file");
+				if (media_file!=null){
+					log.info("media_file=" + media_file);
+					op.setMedia_name(media_file);
+					String media_name = Utils.getPreview(media_file);
+					op.setMedia_preview(media_name);
+				}else{
+					log.info("media_file IS NULL");
+				}
 				ets.add(op);
 			}
 
@@ -258,10 +274,8 @@ public class BlockcastManager {
 		System.out.println( "post.getContent()  : " + post.getContent()) ;
 		System.out.println( "post.getDistance()  : " + post.getDistance()) ;
 		System.out.println( "post.getDuration()  : " + post.getDuration()) ;
-		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters) " + 
-				//"VALUES(ST_GeomFromText('POINT(" + lon + " " +  lat + ")', 4326), ? , -1, CURRENT_TIMESTAMP);";
-				//"VALUES(ST_GeomFromText(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
-				"VALUES(ST_SetSRID(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?);";
+		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters, media_file) " + 
+				"VALUES(ST_SetSRID(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?, ?);";
 		PreparedStatement ps =  null;
 		Connection c = null;
 
@@ -277,6 +291,7 @@ public class BlockcastManager {
 			ps.setString(3, post.getContent());
 			ps.setLong(4, post.getDuration());
 			ps.setLong(5, post.getDistance());
+			ps.setString(6, post.getMedia_name());
 			ps.execute();
 			success = true;
 			ps.close();

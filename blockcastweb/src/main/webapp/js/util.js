@@ -62,13 +62,19 @@ function markPosts(){
 	        fillOpacity: 0.6,
 	    });
 		
-		circleMarker.bindPopup(title + '<br>' + 
-		  		'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
-		  		posts[i].epoch + ' epoch<br>' +
-		  		toDisplayTime(posts[i].duration) + ' post<br>' +
-		  		toDisplayTime(posts[i].sec_elapsed) + ' elapsed<br>' +
-		  		posts[i].distance + ' meter radius<br>');
+		var popup_html = title + '<br>' + 
+  			'('+ posts[i].lat +',' + posts[i].lon +')<br>' +
+  			posts[i].epoch + ' epoch<br>' +
+  			toDisplayTime(posts[i].duration) + ' post<br>' +
+  			toDisplayTime(posts[i].sec_elapsed) + ' elapsed<br>' +
+  			posts[i].distance + ' meter radius';
 		
+		if (posts[i].media_preview){
+			popup_html += '<br><img src=' + '"' + servername + static_path + posts[i].media_preview + '"' + '/>';
+		}
+  		
+		circleMarker.bindPopup(popup_html);
+
 		markers.addLayer(circleMarker);
 
 	}

@@ -54,8 +54,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import me.blockcast.data.BlockcastManager;
-import me.blockcast.web.pojo.Location;
-import me.blockcast.web.pojo.Post;
+import me.blockcast.common.Location;
+import me.blockcast.common.Post;
 import me.bockcast.utils.Utils;
 
 import org.apache.commons.fileupload.FileItem;
@@ -118,15 +118,6 @@ public class Application extends ResourceConfig  {
 		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
 
 		return BlockcastManager.getPostWithinRadius(distance, lat, lon);
-	}
-
-	@GET
-	@Path("/getPosts")
-	@Produces({"application/json", "text/xml"})
-	public List<Post> getEntitys() {
-		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
-
-		return BlockcastManager.getPosts();
 	}
 
 	@GET
@@ -204,11 +195,10 @@ public class Application extends ResourceConfig  {
 					logger.info("newfile: " + newfile);
 					
 					File smallfile = new File( Utils.uploadfolder + uuid.toString() + "_small." + ext);
-					File bigfile = new File( Utils.uploadfolder + uuid.toString() + "_small." + ext);
+					File bigfile = new File( Utils.uploadfolder + uuid.toString() + "." + ext);
 					
 					try {
 						FileUtils.copyFile(f, bigfile);
-						FileUtils.copyFile(f, smallfile);
 					} catch (IOException e2) {
 						logger.severe(e2.toString());
 					}
@@ -234,6 +224,10 @@ public class Application extends ResourceConfig  {
 					} catch (IOException e) {
 						logger.severe(e.toString());
 					}
+					
+					post.setMedia_name(bigfile.getName());
+					post.setMedia_file(smallfile);
+					
 				}		
 			}    
 		}
@@ -241,6 +235,7 @@ public class Application extends ResourceConfig  {
 		location.setLat(lat);
 		location.setLon(lon);
 		post.setLocation(location);	
+		
 		boolean ret = BlockcastManager.insertPost(post);
 
 		return "" + ret;
@@ -269,160 +264,6 @@ public class Application extends ResourceConfig  {
 		return String.valueOf(count);
 	}
 
-
-	// This method is called if HTML is request
-	/*
-	@GET
-	@Produces(MediaType.TEXT_HTML)
-	public String sayHtmlHello() {
-		return "<html> " + "<title>" + "Current time" + "</title>"
-				+ "<body><h1>" + "Current time: " + new Date().toString() + "</body></h1><br><br>" + 
-				"temp directory: " + System.getProperty("java.io.tmpdir")+ "</html> ";
-	}
-
-	@GET
-	@Path("upload")
-	@Produces(MediaType.TEXT_HTML)
-	public String uploadGet() {
-		return "<html> " + "<title>" + "upload get" + "</title>"
-				+ "<body><h1>" + "upload get:" + new Date().toString() + "</body></h1>" + "</html> ";
-	}
-	 */
-	/*
-	@POST
-	@Path("upload")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String uploadFile(@Context HttpServletRequest request,
-			@Context HttpServletResponse response) throws Exception {
-
-
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
-		if (isMultipart) {
-
-			logger.log(Level.SEVERE, "isMultipart");	    
-			FileItemFactory factory = new DiskFileItemFactory();
-			ServletFileUpload upload = new ServletFileUpload(factory);
-
-			try {
-				List items = upload.parseRequest(request);
-				Iterator iterator = items.iterator();
-				while (iterator.hasNext()) {
-					FileItem item = (FileItem) iterator.next();
-					if (!item.isFormField()) {
-						String fileName = item.getName();
-
-						String root = System.getProperty("java.io.tmpdir");
-						File path = new File(root + File.separator + "fileuploads");
-						if (!path.exists()) {
-							boolean status = path.mkdirs();
-						}
-						logger.log(Level.INFO, "path + File.separator + fileName= " + path + File.separator + fileName);	  
-						File uploadedFile = new File(path + File.separator + fileName);
-						item.write(uploadedFile);
-					}
-				}
-			} catch (Exception e) {
-				logger.log(Level.SEVERE, "err: "+e.toString());	    
-			}
-		}else{
-			logger.log(Level.INFO, "is NOT Multipart");	  
-		}
-		//String retString = "{\"Name\":\"reedbn\",\"Age\":\"38\"}";
-
-		String retString = "{" +
-						   "\"files\":"+
-						   "["+
-						     "{" + 
-			        	       "\"url\": \"url\","+
-			                   "\"thumbnail_url\": \"thumbnail_url\","+
-			                   "\"name\": \"name\","+
-			                   "\"type\": \"type\","+
-			                   "\"size\": \"46353\","+
-			                   "\"delete_url\": \"delete_url\","+
-			                   "\"delete_type\": \"delete_type\""+
-			        	   	 "}"+
-			        	   "]" +
-			        	   "}";
-
-		logger.log(Level.INFO, "retString" + retString);	  
-
-		return retString;
-	}
-	 */
-
-
-	/*
-	 * 
-	 * JsonObjectBuilder jsonbuilder = Json.createObjectBuilder();
-
-if (!ServletFileUpload.isMultiPartContent(request){
-    return jsonbuilder.add("error", "REQ is not multipart").build().toString();
-}
-
-
-
-
-ServletFileUpload uploadHandler = new ServletFileUpload(new
-DiskFileItemFactory());
-
-
-String portUrl = "";
-if (request.getServerPort() != 80){
-    portUrl = ":" + request.getServerPort();
-}
-String restUrl = request.getScheme() + "://" + request.getServerName()
-+ portUrl + request.getContextPath();
-
-
-File tempfile = new File(tempdir);
-
-// if tempdir doesnt exist make it
-
-JsonArrayBuilder jarraybuilder = Json.CreateArrayBuilder();
-
-List<FileItem> items = uploadHandler.parseRequest(request);
-
-For (FileItem item : items){
-
-if (!item.isFormField()){
-
-
-
-
-JsonObjectBuilder job = new...
-String nameOnly =
-item.getName().substring(item.getName().lastIndexOf("\\")+1,
-item.getName().length());
-
-String index = item.getName().lastIndexOf('.');
-
-int length = item.getName().length();
-
-String extension = item.getName().substring(index,length);
-
-File f = new File(tempdir, "FILENAME");
-item.write(f);
-
-job.add("","")
-//...
-jarraybuilder.add(job.build());
-
-}
-
-ret jarraybuilder.build().toString();
-	 */
-
-	@GET
-	@Path("upload")
-	@Produces(MediaType.APPLICATION_JSON)
-	public String uploadget(@Context HttpServletRequest request,
-			@Context HttpServletResponse response) throws Exception {
-
-		return "(\"success\": \"true\")";
-	}
-
 	@POST
 	@Path("upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -441,7 +282,6 @@ ret jarraybuilder.build().toString();
 		if(!tmpdirfile.exists()) {
 			mkfolder = tmpdirfile.mkdir();
 		}
-
 
 		// Commons file upload classes are specifically instantiated
 
@@ -527,22 +367,7 @@ ret jarraybuilder.build().toString();
 			}
 		}
 
-		/*try{
 
-
-			// Close off the response XML data and stream
-			//out.write(arraybuilder.build().toString().getBytes());
-			//out.close();
-			// Rudimentary handling of any exceptions
-			// TODO: Something useful if an error occurs
-		} catch (FileUploadException fue) {
-			logger.info("FileUploadException: " + fue.toString());  
-		} catch (IOException ioe) {
-			logger.info("IOException: " + ioe.toString());  
-		} catch (Exception e) {
-			logger.info("Exception: " + e.toString());  
-		}
-		 */
 
 		String ret = "{\"files\":[{" + 
 				"\"url\":\"http://url.to/file/or/page\"," + 
@@ -561,41 +386,14 @@ ret jarraybuilder.build().toString();
 
 	}
 
-	/*
-	  @POST
-	  @Consumes(MediaType.MULTIPART_FORM_DATA)
-	  @Produces(MediaType.APPLICATION_JSON)
-	  @Path("/uploadfile")
-	  public JSONObject uploadProductImage(BufferedInMultiPart bimp) throws IOException, JSONException {
 
+	@GET
+	@Path("/getPosts")
+	@Produces({"application/json", "text/xml"})
+	public List<Post> getEntitys() {
+		// return eq.getEntityWithinRadius(entityTypeId, distance, lon, lat);
 
-	      OutputStream out = null ;
-	      Random rand = new Random();
-	      List parts = bimp.getParts();
-	      Debug.logInfo("parts size : " + parts.size(), module);
-	      Iterator it = parts.iterator();
-	      byte[] bytes = null;
-	      while(it.hasNext()){
-	          InPart name = (InPart) it.next();
-	          try{
-	              InputStream inputStream= name.getInputStream();
-	              out = new FileOutputStream("/home/aspire17/Pictures/Product.png");
-	              int read=0;
-	              bytes = new byte[1024];
-	              while((read = inputStream.read(bytes))!= -1){
-	                  out.write(bytes, 0, read);
-	              }
-	              inputStream.close();
-	              out.flush();
-	              out.close();
-	          }
-	          catch (IOException e){
-	          }
-
-	      }
-	  }
-	 */
-
-
+		return BlockcastManager.getPosts();
+	}
 
 }

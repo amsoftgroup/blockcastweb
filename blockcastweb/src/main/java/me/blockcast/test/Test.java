@@ -3,8 +3,9 @@ package me.blockcast.test;
 import java.util.ArrayList;
 
 import me.blockcast.data.*;
-import me.blockcast.web.pojo.Location;
-import me.blockcast.web.pojo.Post;
+import me.blockcast.common.Location;
+import me.blockcast.common.Post;
+
 public class Test {
 
 	

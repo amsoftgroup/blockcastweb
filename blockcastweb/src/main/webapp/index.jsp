@@ -1,6 +1,6 @@
 <%@ page import="me.blockcast.data.BlockcastManager" %>
-<%@ page import="me.blockcast.web.pojo.Post" %>
-<%@ page import="me.blockcast.web.pojo.Location" %>
+<%@ page import="me.blockcast.common.Post" %>
+<%@ page import="me.blockcast.common.Location" %>
 <%@ page import="java.util.Random" %>
 <html>
 <head>
@@ -99,7 +99,4 @@ for (int i = 0; i<randInt(3,8); i++) {
 %>
 </body>
 </html>
-    
 
-</body>
-</html>
