@@ -183,7 +183,7 @@ public class BlockcastManager {
 		
 		return ets;
 	}
-
+	
 	public static ArrayList<Post> getPosts(){
 		
 		//Use line below for actual distance to points instead of radius post
@@ -274,8 +274,9 @@ public class BlockcastManager {
 		System.out.println( "post.getContent()  : " + post.getContent()) ;
 		System.out.println( "post.getDistance()  : " + post.getDistance()) ;
 		System.out.println( "post.getDuration()  : " + post.getDuration()) ;
-		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters, media_file) " + 
-				"VALUES(ST_SetSRID(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?, ?);";
+		System.out.println( "post.getGuid()  : " + post.getGuid()) ;
+		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters, media_file, ip,guid) " + 
+				"VALUES(ST_SetSRID(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?);";
 		PreparedStatement ps =  null;
 		Connection c = null;
 
@@ -292,6 +293,8 @@ public class BlockcastManager {
 			ps.setLong(4, post.getDuration());
 			ps.setLong(5, post.getDistance());
 			ps.setString(6, post.getMedia_name());
+			ps.setString(7, post.getIp());
+			ps.setString(8, post.getGuid());
 			ps.execute();
 			success = true;
 			ps.close();

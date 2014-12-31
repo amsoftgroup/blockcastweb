@@ -126,9 +126,16 @@ public class Application extends ResourceConfig  {
 	public List<Post> getPostsByDistanceAndDuration(
 			@PathParam("distance") int distance,
 			@PathParam("lat") double lat,
-			@PathParam("lon") double lon) {
+			@PathParam("lon") double lon,
+			@Context HttpServletRequest req) {
+	    String remoteHost = req.getRemoteHost();
+	    String remoteAddr = req.getRemoteAddr();
+	    int remotePort = req.getRemotePort();
+	    String msg = remoteHost + " (" + remoteAddr + ":" + remotePort + ")";
 		logger.info("Calling  BlockcastManager.getPostWithinRadiusAndDuration(" + distance + "," +  lat +","  + lon + ")");
-		return BlockcastManager.getPostWithinRadiusAndDuration(distance, lat, lon);
+		logger.info("msg:" + msg);
+	    return BlockcastManager.getPostWithinRadiusAndDuration(distance, lat, lon);
+		
 	}
 
 
@@ -147,19 +154,37 @@ public class Application extends ResourceConfig  {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_HTML)
 	//public String insertPost(@FormDataParam("schema") final String schema) {
-	public String insertPost(FormDataMultiPart formDataMultiPart) {
+	public String insertPost(FormDataMultiPart formDataMultiPart, @Context HttpServletRequest req) {
+
+/*
+		MultivaluedMap m = formDataMultiPart.getHeaders();
+
+		Iterator entries = m.entrySet().iterator();
+		while (entries.hasNext()) {
+		  Entry thisEntry = (Entry) entries.next();
+		  Object key = thisEntry.getKey();
+		  Object value = thisEntry.getValue();
+		  logger.info("Iterator: k" + key + "  v" + value);
+		}
+*/
+	    String remoteHost = req.getRemoteHost();
+	    String remoteAddr = req.getRemoteAddr();
+	    int remotePort = req.getRemotePort();
 
 		Map<String, List<FormDataBodyPart>> fields = formDataMultiPart.getFields();
 
 		Post post = new Post();
 		double lon = Double.MAX_VALUE;
 		double lat = Double.MAX_VALUE;
-
+		String guid = null;
+		
+		post.setIp(remoteHost);
+		
 		// TODO: no need to loop, we're only interested in element 0 (for now?)
 		for (Entry<String, List<FormDataBodyPart>> entry : fields.entrySet()){
 			List<FormDataBodyPart> formdatabodyparts = entry.getValue();
 
-
+			
 			for (int i = 0; i < formdatabodyparts.size(); i++){
 				String name = formdatabodyparts.get(i).getName();
 
@@ -178,6 +203,8 @@ public class Application extends ResourceConfig  {
 					lon = (Double.valueOf(formdatabodyparts.get(i).getValue()));
 				}else if ("lat".equalsIgnoreCase(name)){
 					lat = (Double.valueOf(formdatabodyparts.get(i).getValue()));
+				}else if ("guid".equalsIgnoreCase(name)){
+					post.setGuid(formdatabodyparts.get(i).getValue());
 				}else if ("file".equalsIgnoreCase(name)){	
 					
 					UUID uuid = UUID.randomUUID();

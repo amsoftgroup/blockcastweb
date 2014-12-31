@@ -71,7 +71,6 @@
 			<version>2.4</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
@@ -138,7 +137,7 @@
 			<version>1.2</version>
 		</dependency>
 
-		<!-- Google Maps -->
+<!-- Google Maps 
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-mapsengine</artifactId>
@@ -149,6 +148,7 @@
 			<artifactId>mapsengine-api-java-wrapper</artifactId>
 			<version>0.1</version>
 		</dependency>
+-->
 
 		<!-- http://stackoverflow.com/questions/20085687/messagebodywriter-not-found-for-media-type-application-json-glassfish -->
 		<dependency>

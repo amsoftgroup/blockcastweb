@@ -1,9 +1,36 @@
 body {
-    background-color: #000000;
+    background-color: #FFFAFA;
     padding: 0;
     margin: 0;
 }
 
 html, body, #map {
     height: 100%;
+}
+
+/*
+<div class="header">
+*/
+.header {
+	font-size:90px;
+}
+
+/*
+<div class="details">
+*/
+.details {
+	font-size:32px;
+}
+
+@font-face {
+    font-family: 'boycottregular';
+    src: url('../webfonts/boycott/boycott_.eot');
+    src: url('../webfonts/boycott/boycott_.eot?#iefix') format('embedded-opentype'),
+         url('../webfonts/boycott/boycott_.woff2') format('woff2'),
+         url('../webfonts/boycott/boycott_.woff') format('woff'),
+         url('../webfonts/boycott/boycott_.ttf') format('truetype'),
+         url('../webfonts/boycott/boycott_.svg#boycottregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
 }

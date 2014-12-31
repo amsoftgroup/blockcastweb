@@ -10,12 +10,20 @@
 	<link rel="stylesheet" href="./css/MarkerCluster.css" />
 	<link rel="stylesheet" href="./css/MarkerCluster.Default.css" />
 	<link rel="stylesheet" href="./css/application.css" />
+	<style type="text/css">
+		body{
+			font-family: 'boycottregular';
+		}
+	</style>
+		
 </head>
 <body>
-  <div id="header">
-	<div id="title"><img src='./images/blockcast_mod3.png'></div> 
+
+	<div class="details">
+	blockcast.me
+	</div>
 	<div id='actions'><a href='#'>Find me!</a></div>
-  </div>
+
     <div id="map" style="width: 100%; height: 80%; background: white"></div>
     
 	<script src="./js/leaflet-0.7.3/leaflet.js"></script>
