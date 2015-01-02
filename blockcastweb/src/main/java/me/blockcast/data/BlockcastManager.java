@@ -101,7 +101,7 @@ public class BlockcastManager {
 		/* ST_MakePoint: x is longitude and y is latitude */
 		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, media_file, " + 
 		"round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " + 
-		"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat " + 
+		"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat, guid " + 
 		"from op " + 
 		"GROUP BY id " +  
 		"HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration  " + 
@@ -150,6 +150,101 @@ public class BlockcastManager {
 				}else{
 					log.info("media_file IS NULL");
 				}
+				ets.add(op);
+			}
+
+			rs.close();
+			ps.close();
+			c.close();
+		}
+		catch( SQLException se )
+		{
+			log.info("**********EXCEPTION= " + se.toString());
+			System.out.println( "SQL Exception:" ) ;
+
+			while( se != null )
+			{
+				System.out.println( "State  : " + se.getSQLState()  ) ;
+				System.out.println( "Message: " + se.getMessage()   ) ;
+				System.out.println( "Error  : " + se.getErrorCode() ) ;
+
+				se = se.getNextException() ;
+			}
+		}
+		catch( Exception e )
+		{
+			log.info("**********EXCEPTION= " + e.toString());
+			System.out.println( e ) ;
+		}
+
+		ps = null;
+		c = null;
+		d = null;
+		
+		return ets;
+	}
+	
+	public static ArrayList<Post> getPostsByDistanceAndDurationWithGuid(int distance, double lat, double lon, String guid){
+		
+		String sql = "SELECT ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) as dist_meters,  post_duration, media_file, " + 
+		"round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) as sec_elapsed, " + 
+		"id, content, parent_id, post_timestamp, ST_X(location::geometry) as lon, ST_Y(location::geometry) as lat, guid " + 
+		"from op " + 
+		"GROUP BY id " +  
+		"HAVING round((SELECT (EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP))) - (SELECT EXTRACT(EPOCH FROM post_timestamp )))) < post_duration  " + 
+		"and (ST_Distance_Sphere(location , ST_MakePoint(?,?)  ) < ?) " + 
+		"order by dist_meters asc";
+		
+		log.info("**********SQL= " + sql + "lat=" + lat + "lon=" + lon + "distance=" + distance);
+
+		ArrayList<Post> ets = new ArrayList<Post>();
+
+		PreparedStatement ps =  null;
+		Connection c = null;
+
+		Database d = new Database();
+
+		try {
+
+			c = d.getConnection();
+			ps = c.prepareStatement(sql);
+			
+			ps.setDouble(1, lon);
+			ps.setDouble(2, lat);
+			ps.setDouble(3, lon);
+			ps.setDouble(4, lat);
+			ps.setInt(5, distance);
+			
+			ResultSet rs = ps.executeQuery();
+			log.info("**********rs= " + rs.getFetchSize());
+			while( rs.next() ){		
+				Post op = new Post();
+				op.setContent(rs.getString("content"));
+				op.setId(rs.getInt("id"));
+				op.setParentId(rs.getInt("parent_id"));
+				java.util.Date date = rs.getTimestamp("post_timestamp");
+				op.setEpoch(date.getTime()/1000l);
+				op.setDistance(rs.getLong("dist_meters"));
+				op.setDuration(rs.getLong("post_duration"));
+				op.setSec_elapsed(rs.getInt("sec_elapsed"));				
+				String media_file = rs.getString("media_file");
+				if (media_file!=null){
+					log.info("media_file=" + media_file);
+					op.setMedia_name(media_file);
+					String media_name = Utils.getPreview(media_file);
+					op.setMedia_preview(media_name);
+				}else{
+					log.info("media_file IS NULL");
+				}
+				
+				String ismine = rs.getString("guid");
+				
+				if ((ismine != null) && (ismine.length() > 0) && (!ismine.equals("")) && (ismine.equals(guid))){
+					op.setMine(1);
+				}else{
+					op.setMine(0);
+				}
+				
 				ets.add(op);
 			}
 
@@ -275,7 +370,7 @@ public class BlockcastManager {
 		System.out.println( "post.getDistance()  : " + post.getDistance()) ;
 		System.out.println( "post.getDuration()  : " + post.getDuration()) ;
 		System.out.println( "post.getGuid()  : " + post.getGuid()) ;
-		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters, media_file, ip,guid) " + 
+		String sql = " INSERT INTO op(location, content, parent_id, post_timestamp, post_duration, post_radius_meters, media_file, ip, guid) " + 
 				"VALUES(ST_SetSRID(ST_MakePoint(?, ?), 4326), ? , -1, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?);";
 		PreparedStatement ps =  null;
 		Connection c = null;
@@ -326,8 +421,54 @@ public class BlockcastManager {
 
 	}
 	
-	public static String testDB(){
+	public static int delete(String commentid, String userid){
+		
+		String sql = " DELETE FROM OP WHERE id = ? AND guid = ?";
+		PreparedStatement ps =  null;
+		Connection c = null;
+		int rows = 0;
+		Database d = new Database();
 
+		try {
+
+			c = d.getConnection();
+			ps = c.prepareStatement(sql);
+
+			ps.setString(1, commentid);
+			ps.setString(2, userid);
+			rows = ps.executeUpdate();
+			
+			ps.close();
+			c.close();
+			
+			
+		}catch( SQLException se ){
+
+			System.out.println( "SQL Exception:" ) ;
+
+			while( se != null )
+			{
+				System.out.println( "State  : " + se.getSQLState()  ) ;
+				System.out.println( "Message: " + se.getMessage()   ) ;
+				System.out.println( "Error  : " + se.getErrorCode() ) ;
+
+				se = se.getNextException() ;
+			}
+		}
+		catch( Exception e )
+		{
+			System.out.println( e ) ;
+		}
+		
+		ps = null;
+		c = null;
+		d = null;
+		
+		return rows;
+		
+	}
+	
+	public static String testDB(){
 
 		String sql = " Select version()";
 		PreparedStatement ps =  null;
@@ -342,10 +483,8 @@ public class BlockcastManager {
 			ps = c.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 			
-			while( rs.next() ){		
-				
+			while( rs.next() ){				
 				version = rs.getString("version");
-
 			}
 
 			rs.close();

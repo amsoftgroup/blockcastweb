@@ -138,35 +138,69 @@ public class Application extends ResourceConfig  {
 		
 	}
 
-
-
+	@GET
+	@Path("/getPostsByDistanceAndDurationWithGuid/{distance}/{lat}/{lon}/{guid}")
+	@Produces({"application/json"})
+	public List<Post> getPostsByDistanceAndDurationWithGuid(
+			@PathParam("distance") int distance,
+			@PathParam("lat") double lat,
+			@PathParam("lon") double lon,
+			@PathParam("guid") String guid,
+			@Context HttpServletRequest req) {
+	    String remoteHost = req.getRemoteHost();
+	    String remoteAddr = req.getRemoteAddr();
+	    int remotePort = req.getRemotePort();
+	    String msg = remoteHost + " (" + remoteAddr + ":" + remotePort + ")";
+		logger.info("Calling  BlockcastManager.getPostsByDistanceAndDurationWithGuid(" + distance + "," +  lat +","  + lon + "," + guid + ")");
+		logger.info("msg:" + msg);
+	    return BlockcastManager.getPostsByDistanceAndDurationWithGuid(distance, lat, lon, guid);
+		
+	}
+	
 	@GET
 	@Path("/insertPost")
 	@Produces(MediaType.TEXT_HTML)
 	public String insertPost() {
-
 		return "returned from /insertPost: " + new Date().toGMTString();
 	}
 
+	@POST
+	@Path("/deletePost")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.TEXT_HTML)
+	public int deletePost(FormDataMultiPart formDataMultiPart, @Context HttpServletRequest req) {
+		
+	    String remoteHost = req.getRemoteHost();
+	    String remoteAddr = req.getRemoteAddr();
+	    int remotePort = req.getRemotePort();
+	    String commentid = null;
+	    String guid = null;
+	    
+		Map<String, List<FormDataBodyPart>> fields = formDataMultiPart.getFields();
 
+		for (Entry<String, List<FormDataBodyPart>> entry : fields.entrySet()){
+			List<FormDataBodyPart> formdatabodyparts = entry.getValue();
+
+			for (int i = 0; i < formdatabodyparts.size(); i++){
+				String name = formdatabodyparts.get(i).getName();
+
+				if ("commentid".equalsIgnoreCase(name)){
+					commentid = formdatabodyparts.get(i).getValue();
+				}else if ("guid".equalsIgnoreCase(name)){
+					guid = formdatabodyparts.get(i).getValue();
+				}
+			}
+		}
+		int retval = BlockcastManager.delete(commentid, guid);
+		return retval;
+	}
+	
 	@POST
 	@Path("/insertPost")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_HTML)
-	//public String insertPost(@FormDataParam("schema") final String schema) {
 	public String insertPost(FormDataMultiPart formDataMultiPart, @Context HttpServletRequest req) {
 
-/*
-		MultivaluedMap m = formDataMultiPart.getHeaders();
-
-		Iterator entries = m.entrySet().iterator();
-		while (entries.hasNext()) {
-		  Entry thisEntry = (Entry) entries.next();
-		  Object key = thisEntry.getKey();
-		  Object value = thisEntry.getValue();
-		  logger.info("Iterator: k" + key + "  v" + value);
-		}
-*/
 	    String remoteHost = req.getRemoteHost();
 	    String remoteAddr = req.getRemoteAddr();
 	    int remotePort = req.getRemotePort();
@@ -282,7 +316,6 @@ public class Application extends ResourceConfig  {
 		return "<?xml version=\"1.0\"?>" + "<hello> Hello World" + "</hello>";
 	}
 
-
 	@GET
 	@Path("count")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -326,7 +359,6 @@ public class Application extends ResourceConfig  {
 		String restUrl = request.getScheme() + "://" + request.getServerName()
 				+ portUrl + request.getContextPath();
 
-
 		// Parse the request
 		List<FileItem> items = upload.parseRequest(request);
 		boolean ismultipart = ServletFileUpload.isMultipartContent(request);
@@ -334,7 +366,6 @@ public class Application extends ResourceConfig  {
 		logger.info("ismultipart=" + ismultipart);
 		logger.info("content_len=" + content_len);
 		JsonArrayBuilder jarraybuilder = Json.createArrayBuilder();
-
 
 		logger.info("items: " + items.size()); 
 
@@ -394,22 +425,8 @@ public class Application extends ResourceConfig  {
 			}
 		}
 
-
-
-		String ret = "{\"files\":[{" + 
-				"\"url\":\"http://url.to/file/or/page\"," + 
-				"\"thumbnail_url\":\"http://url.to/thumnail.jpg\"," + 
-				"\"name\":\"thumb2.jpg\"," + 
-				"\"type\":\"image/jpeg\"," + 
-				"\"size\":\"46353\"," + 
-				"\"delete_url\":\"http://url.to/delete/file/\"," + 
-				"\"delete_type\":\"DELETE\"" + 
-				"}]}";
-
-
 		//System.out.println(arraybuilder.build().toString());
 		return arraybuilder.build().toString();
-		//return ret;
 
 	}
 
