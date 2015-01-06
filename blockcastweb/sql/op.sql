@@ -2,6 +2,7 @@
 
 -- DROP TABLE public.op;
 
+
 CREATE TABLE public.op
 (
   id bigint NOT NULL DEFAULT nextval('op_id_seq'::regclass),
@@ -11,6 +12,9 @@ CREATE TABLE public.op
   post_timestamp timestamp without time zone,
   post_duration bigint,
   post_radius_meters bigint,
+  media_file character varying,
+  ip character varying,
+  guid character varying,
   CONSTRAINT pk_op PRIMARY KEY (id )
 )
 WITH (
