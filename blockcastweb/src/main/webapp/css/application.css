@@ -8,18 +8,26 @@ html, body, #map {
     height: 100%;
 }
 
-/*
-<div class="header">
-*/
 .header {
 	font-size:90px;
+	font-family: 'boycottregular';
+	text-align: center;
+	margin-bottom: 100px;
 }
 
-/*
-<div class="details">
-*/
+.subheader {
+	font-size:32px;
+	font-family: 'boycottregular';
+	text-align: center
+}
+
 .details {
 	font-size:32px;
+	font-family: "Courier New", Courier, monospace;
+	margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 150px;
+    margin-left: 50px;
 }
 
 @font-face {

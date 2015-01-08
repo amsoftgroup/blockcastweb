@@ -1,6 +1,8 @@
 
 var map = L.map('map').setView([38.8951, -77.0367], 13);
+
 var servername = "http://www.blockcast.me";
+//var servername = "http://localhost:8080/blockcast";
 var static_path = "/static/";
 var api = "/restapiv1.0/";
 
