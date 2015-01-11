@@ -423,6 +423,8 @@ public class BlockcastManager {
 	
 	public static int delete(String commentid, String userid){
 		
+		int i = Integer.parseInt(commentid);
+		
 		String sql = " DELETE FROM OP WHERE id = ? AND guid = ?";
 		PreparedStatement ps =  null;
 		Connection c = null;
@@ -434,7 +436,7 @@ public class BlockcastManager {
 			c = d.getConnection();
 			ps = c.prepareStatement(sql);
 
-			ps.setString(1, commentid);
+			ps.setInt(1, i);
 			ps.setString(2, userid);
 			rows = ps.executeUpdate();
 			

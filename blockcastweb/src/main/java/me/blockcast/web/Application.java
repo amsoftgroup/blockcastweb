@@ -168,7 +168,7 @@ public class Application extends ResourceConfig  {
 	@Path("/deletePost")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_HTML)
-	public int deletePost(FormDataMultiPart formDataMultiPart, @Context HttpServletRequest req) {
+	public String deletePost(FormDataMultiPart formDataMultiPart, @Context HttpServletRequest req) {
 		
 	    String remoteHost = req.getRemoteHost();
 	    String remoteAddr = req.getRemoteAddr();
@@ -192,7 +192,7 @@ public class Application extends ResourceConfig  {
 			}
 		}
 		int retval = BlockcastManager.delete(commentid, guid);
-		return retval;
+		return ""+retval;
 	}
 	
 	@POST

@@ -16,11 +16,17 @@
 	<div class="header">
 		blockcast.me
 	</div>
+	<div class="subheader">
+		geospatial/temporal comms on your mobile
+	</div>
 	<div class="details">
-		geospatial/temporal comms on your mobile.</br>
+		</br>
+		<blockquote>
 		* Keep up to date with relevant info near you.</br>
 		* Post timely information relevant to others near you.</br>
-		* Check out an example <a href='./dashboard.jsp'>dashboard</a> of blockcast activity.
+		* Check out an example <a href='./dashboard.jsp'>dashboard</a> of blockcast activity.</br>
+		* Download for Android <a href='https://play.google.com/store/apps/details?id=com.sombrerosoft.blockcast&hl=en'>here</a>.
+		</blockquote>
 	</div>
 </div>
 </body>
