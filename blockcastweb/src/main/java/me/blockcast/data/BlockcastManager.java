@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import me.blockcast.database.postgres.Database;
 import me.blockcast.common.Post;
-import me.bockcast.utils.Utils;
+import me.blockcast.utils.Utils;
 
 public class BlockcastManager {
 	
@@ -323,7 +323,7 @@ public class BlockcastManager {
 				op.setSec_elapsed(rs.getInt("sec_elapsed"));
 				String media_file = rs.getString("media_file");
 				if (media_file!=null){
-					log.info("media_file=" + media_file);
+					//log.info("media_file=" + media_file);
 					op.setMedia_name(media_file);
 					String media_name = Utils.getPreview(media_file);
 					op.setMedia_preview(media_name);

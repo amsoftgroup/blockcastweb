@@ -24,7 +24,7 @@
 		<blockquote>
 		* Keep up to date with relevant info near you.</br>
 		* Post timely information relevant to others near you.</br>
-		* Check out an example <a href='www.blockcast.me/dashboard.jsp'>dashboard</a> of blockcast activity.</br>
+		* Check out an example <a href='./dashboard.jsp'>dashboard</a> of blockcast activity.</br>
 		* Download for Android <a href='https://play.google.com/store/apps/details?id=com.sombrerosoft.blockcast&hl=en'>here</a>.
 		</blockquote>
 	</div>

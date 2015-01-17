@@ -56,7 +56,7 @@ import javax.ws.rs.core.UriInfo;
 import me.blockcast.data.BlockcastManager;
 import me.blockcast.common.Location;
 import me.blockcast.common.Post;
-import me.bockcast.utils.Utils;
+import me.blockcast.utils.Utils;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;

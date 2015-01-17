@@ -34,4 +34,9 @@
         <servlet-name>me.blockcast.web.Application</servlet-name>
         <url-pattern>/restapiv1.0/*</url-pattern>
     </servlet-mapping>
+    
+    <listener>
+        <listener-class> me.blockcast.sandbox.websockets.DrawboardContextListener</listener-class>
+    </listener>
+    
 </web-app>
