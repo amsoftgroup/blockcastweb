@@ -123,7 +123,7 @@
       <Host name="www.blockcast.me"  appBase="blockcast" unpackWARs="true" autoDeploy="true">
         <Alias>blockcast.me</Alias>
         <Alias>www.blockcast.me</Alias>
- <!--   <Context docBase="/tmp" path="/static" />-->
+        <Context docBase="/tmp" path="/static" />
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
         <!--
