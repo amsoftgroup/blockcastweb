@@ -86,6 +86,10 @@ import static org.imgscalr.Scalr.*;
 import org.imgscalr.Scalr;
 import org.json.JSONArray;
 import org.json.JSONObject;
+//import org.springframework.web.filter.RequestContextFilter;
+
+import org.glassfish.jersey.server.ResourceConfig;
+
 
 
 //Sets the path to base URL + /restapi
@@ -98,6 +102,13 @@ public class Application extends ResourceConfig  {
 	public Application(){
 		register(MultiPartFeature.class);
 		registerInstances(new LoggingFilter(Logger.getLogger(Application.class.getName()), true));
+		
+		//Spring
+		// register(RequestContextFilter.class);
+		// register(JerseyResource.class);
+		// register(SpringSingletonResource.class);
+		// register(SpringRequestResource.class);
+		// register(CustomExceptionMapper.class);
 	}
 
 	@GET

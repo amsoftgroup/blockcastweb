@@ -43,6 +43,8 @@ function markPosts(){
 
 	var posts = getPosts();
 	
+	
+	
 	for (var i = 0; i < posts.length; i++) {
 
 		var title = posts[i].content;
@@ -76,10 +78,13 @@ function markPosts(){
 		circleMarker.bindPopup(popup_html);
 
 		markers.addLayer(circleMarker);
+		
+		
 
 	}
 
 	map.addLayer(markers);
+	L.control.layers(markers).addTo(map);
 }
 
 function getPosts(){

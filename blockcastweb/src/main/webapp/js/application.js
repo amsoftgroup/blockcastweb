@@ -23,6 +23,7 @@ $(function () {
 	}).addTo(map);
 	
 	L.control.scale().addTo(map);
+	//L.control.layers().addTo(map);
 	
 	var popup = L.popup();
 

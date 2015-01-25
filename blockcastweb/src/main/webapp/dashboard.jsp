@@ -15,10 +15,10 @@
 </head>
 <body>
 
-	<div class="subheader">
-	blockcast.me
+	<div class="header">
+	  <a href='./index.jsp'>blockcast.me</a>
 	</div>
-	<div id='actions'><a href='#'>Find me!</a></div>
+	<div id='actions' class='detailsboycottregular'><a href='#'>Find me!</a></div>
 
     <div id="map" style="width: 100%; height: 100%; background: white"></div>
     
