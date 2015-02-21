@@ -1,0 +1,187 @@
+************************************** Install Java on Ubuntu
+
+http://askubuntu.com/questions/56104/how-can-i-install-sun-oracles-proprietary-java-jdk-6-7-8-or-jre
+
+
+    Download the 32-bit or 64-bit Linux "compressed binary file" - it has a ".tar.gz" file extension.
+
+    Uncompress it
+
+    tar -xvf jdk-8-linux-i586.tar.gz (32-bit)
+
+    tar -xvf jdk-8-linux-x64.tar.gz (64-bit)
+
+    The JDK 8 package is extracted into ./jdk1.8.0 directory. N.B.: Check carefully this folder name since Oracle seem to change this occasionally with each update.
+
+    Now move the JDK 8 directory to /usr/lib
+
+    sudo mkdir -p /usr/lib/jvm
+    sudo mv ./jdk1.8.0 /usr/lib/jvm/
+
+    Now run
+
+    sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.8.0/bin/java" 1
+    sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.8.0/bin/javac" 1
+    sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.8.0/bin/javaws" 1
+
+    This will assign Oracle JDK a priority of 1, which means that installing other JDKs will replace it as the default. Be sure to use a higher priority if you want Oracle JDK to remain the default.
+
+    Correct the file ownership and the permissions of the executables:
+
+    sudo chmod a+x /usr/bin/java
+    sudo chmod a+x /usr/bin/javac
+    sudo chmod a+x /usr/bin/javaws
+    sudo chown -R root:root /usr/lib/jvm/jdk1.8.0
+
+    N.B.: Remember - Java JDK has many more executables that you can similarly install as above. java, javac, javaws are probably the most frequently required. This answer lists the other executables available.
+
+    Run
+
+    sudo update-alternatives --config java
+
+    You will see output similar to the one below - choose the number of jdk1.8.0 - for example 3 in this list (unless you have have never installed Java installed in your computer in which case a sentence saying "There is nothing to configure" will appear):
+
+    $ sudo update-alternatives --config java
+    There are 3 choices for the alternative java (providing /usr/bin/java).
+
+      Selection    Path                                            Priority   Status
+    ------------------------------------------------------------
+      0            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      auto mode
+      1            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      manual mode
+    * 2            /usr/lib/jvm/jdk1.7.0/bin/java                   1         manual mode
+      3            /usr/lib/jvm/jdk1.8.0/bin/java                   1         manual mode
+
+    Press enter to keep the current choice[*], or type selection number: 3
+    update-alternatives: using /usr/lib/jvm/jdk1.8.0/bin/java to provide /usr/bin/java (java) in manual mode
+
+    Repeat the above for:
+
+    sudo update-alternatives --config javac
+    sudo update-alternatives --config javaws
+
+
+
+**************************************************  install Postgresql 9.4, PostGIS 2.1, PGAdmin 1.20 and shp2pgsql-gui on Ubuntu versions 12.04 and 14.04.1 
+
+http://trac.osgeo.org/postgis/wiki/UsersWikiPostGIS21UbuntuPGSQL93Apt
+
+ Run these in terminal:
+Verify what you are running
+
+sudo lsb_release -a 
+
+Add Respository to sources.list
+
+You'll need to replace the nickname below with what you are running So if you see you are running precise (12.04) do this
+
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" >> /etc/apt/sources.list'
+
+If trusty (14.04)
+
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt trusty-pgdg main" >> /etc/apt/sources.list'
+
+Add Keys
+
+wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
+
+sudo apt-get update
+
+Install
+
+The following will install postgresql 9.4, PostGIS, PGAdmin3, and additional supplied modules including adminpack
+
+sudo apt-get install postgresql-9.4 pgadmin3 postgresql-contrib
+
+For 12.04 thru 13.02, this seems to work
+
+sudo apt-get install postgresql-9.4-postgis pgadmin3 postgresql-contrib
+
+If you are running 14.04 (Trusty) -- you need to do this
+
+sudo apt-get install postgresql-9.4-postgis-2.1 pgadmin3 postgresql-contrib
+
+To get pgRouting
+
+(instructions from  http://workshop.pgrouting.org/chapters/installation.html seems to work fine with PostgreSQL Apt repo PostgreSQL 9.3 install)
+
+sudo apt-add-repository -y ppa:georepublic/pgrouting
+sudo apt-get update
+# Install pgRouting package (for Ubuntu 14.04)
+sudo apt-get install postgresql-9.3-pgrouting
+
+Enable Adminpack
+
+While in terminal, log in to psql as postgres user:
+
+sudo -u postgres psql
+
+CREATE EXTENSION adminpack;
+
+Quit psql:
+
+\q
+
+Create new PGSQL user
+
+You can create a new database super user to use instead of the default postgres user.
+
+While in terminal, run:
+
+sudo su - postgres
+
+createuser -d -E -i -l -P -r -s yourUserName
+
+(be sure to change the username to your desired username)
+
+Enter your new password when prompted
+
+Log out as postgres user:
+
+exit
+
+Exit terminal:
+
+exit
+
+Use PGAdmin to log into database server
+
+From the Ubuntu launcher, type in PGAdmin to reveal the application
+
+Click the Add a connection to server button on the menu in the top-left corner
+
+Fill in the necessary credentials to log in:
+
+- Name: nickname you want to give your connection
+- host: localhost (until you change the connection settings)
+- port: 5432 by default
+- maintenance DB: postgres by default
+- username: whatever you chose in the step above
+- password: whatever you chose in the step above
+
+Enable postgis extensions on new database
+
+Since you installed PostgreSQL and PostGIS from the PostgreSQL apt repository, you now have all the extensions for PostgreSQL, including PostGIS
+
+Expand the database tree in PGAdmin, and reveal the extensions node
+
+Right-click the extensions node, and click new extension
+
+Enable the postgis extension, as well as postgis_topology, and postgis_tiger_geocoder
+
+Alternatively from psql console you can do
+
+CREATE EXTENSION postgis;
+CREATE EXTENSION postgis_topology;
+CREATE EXTENSION postgis_tiger_geocoder;
+
+Import SHP files using shp2pgsql-gui
+
+Another handy piece of software shp2pgsql-gui tool. This will allow you to quickly connect to your new PostGIS database and import a Shapefile.
+
+Open terminal, and type:
+
+shp2pgsql-gui
+
+Follow the on-screen prompts to load your data.
+
+For more information, visit the  Boston GIS tutorial in the section "Load Towns Data" 
