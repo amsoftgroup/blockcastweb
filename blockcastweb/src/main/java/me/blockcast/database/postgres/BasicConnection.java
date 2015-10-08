@@ -11,9 +11,9 @@ public class BasicConnection {
 	//private static String host = "192.168.211.1";
 	private static String host = "xxxxxxxxxx";
 	private static int port = 5432;
-	private static String database = "blockcast";
-	private static String user = "blockcast";
-	private static String password = "Cym4ge!!Cym4ge!!";
+	private static String database = "xxxxxxxxxx";
+	private static String user = "xxxxxxxxxx";
+	private static String password = "xxxxxxxxxx";
 
 	private static String TAG = "Database";
 
