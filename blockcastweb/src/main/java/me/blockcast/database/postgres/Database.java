@@ -7,12 +7,10 @@ import java.sql.SQLException;
 public class Database {
 
 	private static String host = "localhost";
-	//private static String host = "blockcast.me";
 	private static int port = 5432;
-	private static String database = "blockcast";
-	private static String user = "blockcast";
-	private static String password = "Cym4ge!!Cym4ge!!";
-	//private static String password = "elculo";
+	private static String database = "xxxxxxx";
+	private static String user = "xxxxxxx";
+	private static String password = "xxxxxxx";
 	private static String TAG = "Database";
 	
 	//Static class instantiation
